@@ -89,8 +89,26 @@ def main_parallel_tensor_to_image(input_dir, output_dir,
     with Pool(processes=num_processes) as pool:
         pool.starmap(visual_tensor, [(input_dir, filename,
                                       feature_output_tensor, channels_visualisation, output_dir) for filename in filenames])
+        
+def main_not_parallel_tensor_to_image(input_dir, output_dir,
+                                      feature_output_tensor, channels_visualisation):
+    
+    """
+    Параллельная нарезка всех LAS-файлов в директории.
 
+    :param input_directory: Директория с исходными LAS-файлами
+    :param output_directory: Директория для сохранения нарезанных файлов
+    :param tile_size: Размер tile (в метрах)
+    :param num_processes: Количество процессов для параллельной обработки
+    """
+    # Создаем выходную директорию, если ее нет
+    os.makedirs(output_dir, exist_ok=True)
 
+    # Получаем список файлов .las
+    filenames = [f for f in os.listdir(input_dir) if f.endswith('.npy')]
+
+    for filename in filenames:
+        visual_tensor(input_dir, filename, feature_output_tensor, channels_visualisation, output_dir)
 
 if __name__ == "__main__":
     import config_preprocessing as cp

@@ -1,3 +1,7 @@
+test
+temp*
+output_tiles/
+dist.zip
 predictor_building_segmentation\model\*
 temp/
 temp_history/

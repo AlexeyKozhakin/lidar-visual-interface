@@ -311,6 +311,29 @@ def main_parallel_transform_to_tensor(input_directory, output_directory,
                                           feature_input_tensor, feature_output_tensor,num_points_lim, 
                                           M, K) for filename in filenames])
         
+def main_not_parallel_transform_to_tensor(input_directory, output_directory,
+                                          feature_input_tensor, feature_output_tensor,
+                                           num_points_lim, M, K):
+    
+    """
+    Параллельная нарезка всех LAS-файлов в директории.
+
+    :param input_directory: Директория с исходными LAS-файлами
+    :param output_directory: Директория для сохранения нарезанных файлов
+    :param tile_size: Размер tile (в метрах)
+    :param num_processes: Количество процессов для параллельной обработки
+    """
+    # Создаем выходную директорию, если ее нет
+    os.makedirs(output_directory, exist_ok=True)
+
+    # Получаем список файлов .las
+    filenames = [f for f in os.listdir(input_directory) if f.endswith('.las')]
+
+    for filename in filenames:
+        process_transform(filename, input_directory, output_directory,
+                      feature_input_tensor, feature_output_tensor, num_points_lim, M, K)
+                
+        
 def process_transform(filename, input_directory, output_directory,
                       feature_input_tensor, feature_output_tensor, num_points_lim, M, K):
     input_file = os.path.join(input_directory, filename)

@@ -47,8 +47,8 @@ cutoff2=0.01
 # path_las_before_cut = r"C:\Users\alexe\Downloads\UM\work\GFG\profs\Marfa_3M_points_rv"
 # path_las_after_cut = r"C:\Users\alexe\Downloads\UM\work\GFG\profs\Marfa_3M_points_cut"
 
-path_las_before_cut = r"C:\Users\alexe\VSCprojects\lidar-visual-interface\temp\las"
-path_las_after_cut = r"C:\Users\alexe\VSCprojects\lidar-visual-interface\temp\las_cut"
+path_las_before_cut = r"temp\las"
+path_las_after_cut = r"temp\las_cut"
 las_cut_size = 250
 
 # ===== 3.2 Cuted LAS Filter
