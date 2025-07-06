@@ -1,4 +1,4 @@
-output_las_path = r'temp\las_colored'
+output_las_path = r'las_colored'
 
 class_colors = {
     0: [0, 0, 0],

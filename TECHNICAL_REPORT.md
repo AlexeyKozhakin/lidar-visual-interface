@@ -2,13 +2,17 @@
 
 ## Executive Summary
 
-The LiDAR Visual Interface is a comprehensive system designed for processing, analyzing, and visualizing LiDAR (Light Detection and Ranging) data with integrated machine learning capabilities for building segmentation and automated polygon generation. The system provides a complete pipeline from raw LAS files to GIS-ready vector outputs.
+The LiDAR Visual Interface is a comprehensive system designed for processing, analyzing, and visualizing LiDAR (Light Detection and Ranging) data with integrated machine learning capabilities for building segmentation and automated polygon generation. The system provides a complete pipeline from raw LAS files to GIS-ready vector outputs. The system consists of **two main applications**:
+
+1. **Polygon Generation Application** - Processes multiple LAS files to generate building polygons and contours
+2. **3D Multi-Class Segmentation Application** - Processes single LAS files for 3D multi-class segmentation and returns classified LAS files
 
 ## System Architecture
 
 ### Overview
-The system follows a modular architecture with distinct processing stages:
+The system follows a modular architecture with two distinct applications, each with their own processing stages:
 
+#### Polygon Generation Application
 1. **Data Preprocessing Module**
 2. **Feature Extraction Module** 
 3. **Visualization Module**
@@ -16,25 +20,47 @@ The system follows a modular architecture with distinct processing stages:
 5. **Post-processing Module**
 6. **Polygon Generation Module**
 
+#### 3D Multi-Class Segmentation Application
+1. **Single LAS Processing Module**
+2. **Feature Extraction Module**
+3. **Multi-Class Prediction Module**
+4. **3D Point Classification Module**
+5. **LAS Output Generation Module**
+
 ### Core Components
 
-#### 1. Data Preprocessing (`preprocessing/`)
+#### Polygon Generation Application
+
+##### 1. Data Preprocessing (`preprocessing/`)
 - **LAS File Tiling** (`slicing_las.py`): Splits large LAS files into manageable 250m x 250m tiles using lastile utility
 - **Tensor Conversion** (`transformation_las2npy.py`): Converts point cloud data to tensor format with feature extraction
 - **Image Generation** (`image_generator.py`): Creates visual representations from tensor data
 
-#### 2. Machine Learning (`predictor_building_segmentation/`)
+##### 2. Machine Learning (`predictor_building_segmentation/`)
 - **U-Net Architecture**: ResNet34 encoder with segmentation head
 - **Binary Classification**: Building vs. non-building pixel classification
 - **Model Loading**: Efficient checkpoint management and GPU/CPU compatibility
 
-#### 3. Post-processing (`postprocessing/`)
+##### 3. Post-processing (`postprocessing/`)
 - **Image Stitching** (`join_img.py`): Combines processed tiles into larger mosaics
 - **Coordinate Parsing**: Intelligent filename-based coordinate extraction
 
-#### 4. Polygon Generation (`polygon_generator/`)
+##### 4. Polygon Generation (`polygon_generator/`)
 - **Contour Detection**: OpenCV-based boundary detection
 - **Shapefile Export**: GIS-compatible vector output generation
+
+#### 3D Multi-Class Segmentation Application
+
+##### 1. Multi-Class Prediction (`predictor_multiclass_segmentation/`)
+- **U-Net Architecture**: ResNet34 encoder with multi-class segmentation head
+- **Multi-Class Classification**: Support for up to 20 different object classes
+- **Segmentation Maps**: Generate classification masks for each class
+
+##### 2. 3D Point Classification (`generate_colored_las_3D/`)
+- **Coordinate Mapping**: Map 2D segmentation results to 3D point coordinates
+- **Nearest Neighbor Interpolation**: Accurate classification of each 3D point
+- **RGB Color Assignment**: Assign visual colors based on class labels
+- **LAS Enhancement**: Embed classification data and RGB values in LAS files
 
 ## Technical Specifications
 

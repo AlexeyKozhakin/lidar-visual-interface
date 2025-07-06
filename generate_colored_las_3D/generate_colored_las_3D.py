@@ -7,79 +7,79 @@ import os
 def mask_to_las_with_class_nn_rgb(las_file_path, image_file_path, output_las_path,
                                   class_colors,
                                   grid_size=500):
-    # Шаг 1. Чтение исходного LAS файла
+    # Step 1. Reading the source LAS file
     las = laspy.read(las_file_path)
 
-    # Извлечение координат X, Y, Z
+    # Extracting X, Y, Z coordinates
     x, y, z = las.x, las.y, las.z
 
-    # Шаг 2. Чтение изображения маски
+    # Step 2. Reading the mask image
     image = Image.open(image_file_path)
     image = np.array(image)
 
-    # Предположим, что изображение имеет размер (grid_size, grid_size, 3)
+    # Assuming the image has size (grid_size, grid_size, 3)
     img_height, img_width, _ = image.shape
 
-    # Шаг 3. Сдвигаем координаты X, Y так, чтобы они начинались с 0
+    # Step 3. Shift X, Y coordinates so they start from 0
     x_min, y_min = np.min(x), np.min(y)
     x_shifted = x - x_min
     y_shifted = y - y_min
 
-    # Масштабируем координаты LAS файла к диапазону от 0 до 1 (нормализация)
+    # Scale LAS file coordinates to range from 0 to 1 (normalization)
     x_scaled = x_shifted / np.max(x_shifted)
     y_scaled = y_shifted / np.max(y_shifted)
 
-    # Шаг 4. Преобразуем индексы пикселей изображения в координаты от 0 до 1
+    # Step 4. Convert image pixel indices to coordinates from 0 to 1
     xi = np.linspace(0, 1, img_width)
     yi = np.linspace(0, 1, img_height)
     xi, yi = np.meshgrid(xi, yi)
 
-    # Преобразуем координаты сетки изображения и соответствующие цвета в 1D массивы для интерполяции
+    # Convert image grid coordinates and corresponding colors to 1D arrays for interpolation
     xi_flat = xi.ravel()
     yi_flat = yi.ravel()
-    colors_flat = image.reshape(-1, 3)  # Преобразуем цвета изображения в плоский массив
+    colors_flat = image.reshape(-1, 3)  # Convert image colors to flat array
 
-    # Шаг 5. Создаем интерполятор на основе ближайших соседей
+    # Step 5. Create interpolator based on nearest neighbors
     interpolator = NearestNDInterpolator(np.column_stack((xi_flat, yi_flat)), colors_flat)
 
-    # Шаг 6. Применяем интерполяцию для каждой точки из LAS файла
+    # Step 6. Apply interpolation for each point from LAS file
     nearest_colors = interpolator(x_scaled, y_scaled)
 
-    # Преобразуем карту цветов классов в более удобную для поиска структуру
+    # Convert class color map to more convenient structure for lookup
     color_to_class = {tuple(v): k for k, v in class_colors.items()}
 
-    # Шаг 8. Определяем класс и RGB для каждой точки на основании ближайшего цвета
+    # Step 8. Determine class and RGB for each point based on nearest color
     classifications = np.zeros(len(nearest_colors), dtype=np.uint8)
-    rgb_values = np.zeros((len(nearest_colors), 3), dtype=np.uint16)  # для RGB значений
+    rgb_values = np.zeros((len(nearest_colors), 3), dtype=np.uint16)  # for RGB values
 
     for i, color in enumerate(nearest_colors):
-        # Приведение цветов к целым числам для сопоставления
+        # Convert colors to integers for matching
         color = tuple(np.round(color).astype(int))
-        classifications[i] = color_to_class.get(color, 0)  # Класс по умолчанию 0 (Unclassified)
+        classifications[i] = color_to_class.get(color, 0)  # Default class 0 (Unclassified)
 
-        # Записываем RGB-значения для текущего класса
+        # Write RGB values for current class
         if color in color_to_class:
-            rgb = np.array(color) * 256  # Преобразуем цвета в 16-битное значение для LAS
+            rgb = np.array(color) * 256  # Convert colors to 16-bit value for LAS
             rgb_values[i] = rgb.astype(np.uint16)
         else:
-            rgb_values[i] = (0, 0, 0)  # Если класс не найден, ставим черный цвет
+            rgb_values[i] = (0, 0, 0)  # If class not found, set black color
 
-    # Шаг 9. Создание нового LAS файла с нужными данными (x, y, z, classification, rgb)
+    # Step 9. Create new LAS file with required data (x, y, z, classification, rgb)
     new_las = laspy.create(point_format=las.point_format, file_version=las.header.version)
 
-    # Переносим x, y, z, classification
+    # Transfer x, y, z, classification
     new_las.x = x
     new_las.y = y
     new_las.z = z
     new_las.classification = classifications
 
-    # Проверим, поддерживает ли исходный файл LAS сохранение RGB
+    # Check if source LAS file supports RGB saving
     if 'red' in new_las.point_format.dimension_names:
-        new_las.red = rgb_values[:, 0]  # Записываем красный канал
-        new_las.green = rgb_values[:, 1]  # Записываем зеленый канал
-        new_las.blue = rgb_values[:, 2]  # Записываем синий канал
+        new_las.red = rgb_values[:, 0]  # Write red channel
+        new_las.green = rgb_values[:, 1]  # Write green channel
+        new_las.blue = rgb_values[:, 2]  # Write blue channel
     else:
-        # Добавим RGB каналы, если они отсутствуют
+        # Add RGB channels if they are missing
         new_las.point_format.add_extra_dimension(name='red', dtype=np.uint16)
         new_las.point_format.add_extra_dimension(name='green', dtype=np.uint16)
         new_las.point_format.add_extra_dimension(name='blue', dtype=np.uint16)
@@ -88,14 +88,14 @@ def mask_to_las_with_class_nn_rgb(las_file_path, image_file_path, output_las_pat
         new_las.green = rgb_values[:, 1]
         new_las.blue = rgb_values[:, 2]
 
-    # Шаг 10. Сохранение обновленного LAS файла
+    # Step 10. Save updated LAS file
     new_las.write(output_las_path)
 
-    print(f'Файл {output_las_path} успешно создан с классами точек и RGB значениями.')
+    print(f'File {output_las_path} successfully created with point classes and RGB values.')
 
 # === main ===
 if __name__ == "__main__":
-    # Пример словаря цветов классов
+    # Example class color dictionary
     class_colors = {
         0: [0, 0, 0],
         1: [180, 180, 180],
@@ -119,12 +119,12 @@ if __name__ == "__main__":
         19: [0, 254, 0],
     }
 
-    # Пути
+    # Paths
     las_file_path = "temp/las/446_3972.las"
     image_file_path = "temp\img_features_join_multi_class\joined.png"
     output_las_path = "temp/output_file.las"
 
-    # Вызов функции
+    # Function call
     mask_to_las_with_class_nn_rgb(
         las_file_path=las_file_path,
         image_file_path=image_file_path,

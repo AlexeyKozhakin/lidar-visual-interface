@@ -1,6 +1,9 @@
 # LiDAR Visual Interface
 
-A comprehensive system for processing, analyzing, and visualizing LiDAR data with machine learning-based building segmentation and polygon generation.
+A comprehensive system for processing, analyzing, and visualizing LiDAR data with machine learning-based building segmentation and polygon generation. This repository contains **two main applications**:
+
+1. **Polygon Generation Application** - Processes multiple LAS files to generate building polygons and contours
+2. **3D Multi-Class Segmentation Application** - Processes single LAS files for 3D multi-class segmentation and returns classified LAS files
 
 ## Overview
 
@@ -8,6 +11,7 @@ This project provides a complete pipeline for LiDAR data processing, from raw LA
 
 ## Features
 
+### Polygon Generation Application
 - **LiDAR Data Processing**: Convert LAS files to tensor format with feature extraction
 - **Image Generation**: Create visual representations of LiDAR data (RGB and feature images)
 - **Building Segmentation**: Machine learning-based building detection using U-Net architecture
@@ -15,11 +19,20 @@ This project provides a complete pipeline for LiDAR data processing, from raw LA
 - **Parallel Processing**: Multi-threaded processing for large datasets
 - **Web Interface**: Streamlit-based user interface for easy interaction
 
+### 3D Multi-Class Segmentation Application
+- **Single LAS Processing**: Process individual LAS files for 3D segmentation
+- **Multi-Class Classification**: Support for up to 20 different object classes
+- **3D Point Cloud Classification**: Assign classification labels to each 3D point
+- **RGB Color Mapping**: Visual representation of classified points with RGB colors
+- **LAS Output**: Return classified LAS files with embedded classification data
+- **Nearest Neighbor Interpolation**: Accurate mapping of 2D segmentation to 3D points
+
 ## Project Structure
 
 ```
 lidar-visual-interface/
-├── main_poligon.py                 # Main application entry point
+├── main_poligon.py                 # Main polygon generation application
+├── main_color_las.py              # Main 3D segmentation application
 ├── utils.py                        # Utility functions for file management
 ├── preprocessing/                  # Data preprocessing modules
 │   ├── config_preprocessing.py     # Preprocessing configuration
@@ -33,10 +46,16 @@ lidar-visual-interface/
 │   ├── config_prediction.py       # Prediction configuration
 │   ├── predict_building_segmentation.py
 │   └── model/                     # Trained models
+├── predictor_multiclass_segmentation/ # Multi-class ML prediction module
+│   ├── config_prediction.py       # Multi-class prediction configuration
+│   ├── predict_multiclass_segmentation.py
+│   └── model/                     # Multi-class trained models
 ├── polygon_generator/             # Polygon generation module
 │   ├── config_polygon_generator.py
 │   └── polygon_generator.py
 └── generate_colored_las_3D/       # 3D colored LAS generation
+    ├── config_colored_las.py      # 3D segmentation configuration
+    └── generate_colored_las_3D.py # 3D point cloud classification
 ```
 
 ## Installation
@@ -58,9 +77,11 @@ pip install -r requirements.txt
 
 ## Usage
 
-### Web Interface
+### Application 1: Polygon Generation
 
-Run the main application with Streamlit:
+#### Web Interface
+
+Run the polygon generation application with Streamlit:
 
 ```bash
 streamlit run main_poligon.py
@@ -72,7 +93,7 @@ The interface provides:
 - Visualization of results
 - File management
 
-### Command Line
+#### Command Line
 
 Individual modules can be run independently:
 
@@ -93,9 +114,39 @@ python predictor_building_segmentation/predict_building_segmentation.py
 python polygon_generator/polygon_generator.py
 ```
 
-## Processing Pipeline
+### Application 2: 3D Multi-Class Segmentation
 
-### 1. Data Preprocessing
+#### PyQt Interface
+
+Run the 3D segmentation application with PyQt:
+
+```bash
+python main_color_las.py
+```
+
+The interface provides:
+- Single LAS file upload
+- Multi-class segmentation pipeline
+- 3D point cloud classification
+- Colored LAS file output
+
+#### Command Line
+
+Run the 3D segmentation pipeline:
+
+```bash
+# Multi-class prediction
+python predictor_multiclass_segmentation/predict_multiclass_segmentation.py
+
+# 3D point cloud classification
+python generate_colored_las_3D/generate_colored_las_3D.py
+```
+
+## Processing Pipelines
+
+### Polygon Generation Pipeline
+
+#### 1. Data Preprocessing
 - **LAS Tiling**: Split large LAS files into 250m x 250m tiles
 - **Feature Extraction**: Convert point clouds to tensor format with features:
   - Z-mean (elevation)
@@ -103,37 +154,73 @@ python polygon_generator/polygon_generator.py
   - RGB values
   - Classification
 
-### 2. Visualization
+#### 2. Visualization
 - **Feature Images**: Generate grayscale images from extracted features
 - **RGB Images**: Create color images from RGB data
 - **Image Stitching**: Combine tiles into larger mosaics
 
-### 3. Machine Learning
+#### 3. Machine Learning
 - **Building Segmentation**: U-Net model with ResNet34 encoder
 - **Binary Classification**: Building vs. non-building pixels
 - **Model Architecture**: Segmentation Models PyTorch (smp)
 
-### 4. Post-processing
+#### 4. Post-processing
 - **Contour Detection**: Find building boundaries
 - **Polygon Generation**: Create vector polygons
 - **Shapefile Export**: Save results in GIS-compatible format
 
+### 3D Multi-Class Segmentation Pipeline
+
+#### 1. Single LAS Processing
+- **LAS File Input**: Process individual LAS files
+- **Feature Extraction**: Convert to tensor format
+- **Image Generation**: Create feature and RGB images
+
+#### 2. Multi-Class Prediction
+- **Multi-Class Model**: U-Net with ResNet34 encoder
+- **20 Classes**: Support for various object types
+- **Segmentation Maps**: Generate classification masks
+
+#### 3. 3D Point Classification
+- **Coordinate Mapping**: Map 2D segmentation to 3D coordinates
+- **Nearest Neighbor Interpolation**: Accurate point classification
+- **RGB Color Assignment**: Assign colors based on class labels
+
+#### 4. LAS Output Generation
+- **Classification Labels**: Embed classification data in LAS file
+- **RGB Values**: Add color information to each point
+- **Enhanced LAS**: Return classified point cloud with visual data
+
 ## Configuration
 
-### Preprocessing Configuration (`preprocessing/config_preprocessing.py`)
+### Polygon Generation Configuration
+
+#### Preprocessing Configuration (`preprocessing/config_preprocessing.py`)
 - File paths for input/output
 - Tensor size and KNN parameters
 - Feature mapping configuration
 - Visualization channel settings
 
-### Prediction Configuration (`predictor_building_segmentation/config_prediction.py`)
+#### Prediction Configuration (`predictor_building_segmentation/config_prediction.py`)
 - Model checkpoint paths
 - Output directory settings
 
-### Polygon Configuration (`polygon_generator/config_polygon_generator.py`)
+#### Polygon Configuration (`polygon_generator/config_polygon_generator.py`)
 - Minimum polygon area
 - Contour thickness
 - Output format settings
+
+### 3D Segmentation Configuration
+
+#### Multi-Class Prediction Configuration (`predictor_multiclass_segmentation/config_prediction.py`)
+- Multi-class model checkpoint paths
+- Output directory settings
+- Class mapping configuration
+
+#### 3D Classification Configuration (`generate_colored_las_3D/config_colored_las.py`)
+- Class color mapping (20 classes)
+- Output LAS file paths
+- RGB color assignment settings
 
 ## Data Formats
 
@@ -142,9 +229,16 @@ python polygon_generator/polygon_generator.py
 - **Supported**: LAS 1.0-1.4 formats
 
 ### Output
+
+#### Polygon Generation
 - **Tensors**: NumPy arrays (.npy) with extracted features
 - **Images**: PNG files for visualization
 - **Shapefiles**: Vector polygons (.shp, .dbf, .shx)
+
+#### 3D Segmentation
+- **Segmentation Images**: PNG files with class masks
+- **Classified LAS**: Enhanced LAS files with classification labels and RGB colors
+- **Feature Images**: PNG files for visualization
 
 ## Performance
 

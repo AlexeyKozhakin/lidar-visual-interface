@@ -182,29 +182,29 @@ def fast_median(array):
     M, N, K = array.shape  # Размерности входного массива
     reshaped_array = array.reshape(-1, K)  # Преобразуем в (M*M, K)
 
-    # Вычисляем медиану по каждой строке
+    # Calculate median for each row
     median_result = np.median(reshaped_array, axis=1)
 
-    return median_result.reshape(M, N)  # Преобразуем обратно в (M, M)
+    return median_result.reshape(M, N)  # Transform back to (M, M)
 
 
 def compute_features(data_knn, grid, feature_input_tensor, feature_output_tensor):
     """
-    Формирует тензор data_result на основе data_knn (M, M, K, D) и grid (M, M, 2).
+    Forms data_result tensor based on data_knn (M, M, K, D) and grid (M, M, 2).
 
-    Аргументы:
-    - data_knn: numpy массив размерности (M, M, K, D), хранящий K ближайших соседей.
-    - grid: numpy массив размерности (M, M, 2), содержащий x, y координаты.
-    - feature_input_tensor: словарь с индексами входных каналов.
-    - feature_output_tensor: словарь с индексами выходных каналов.
+    Arguments:
+    - data_knn: numpy array of dimension (M, M, K, D), storing K nearest neighbors.
+    - grid: numpy array of dimension (M, M, 2), containing x, y coordinates.
+    - feature_input_tensor: dictionary with input channel indices.
+    - feature_output_tensor: dictionary with output channel indices.
 
-    Возвращает:
-    - data_result: numpy массив размерности (M, M, C), содержащий вычисленные признаки.
+    Returns:
+    - data_result: numpy array of dimension (M, M, C), containing computed features.
     """
     print('shape:', data_knn.shape)
     print('len feature:', len(feature_output_tensor))
     M, _, K, D = data_knn.shape
-    C = len(feature_output_tensor)  # Число выходных каналов
+    C = len(feature_output_tensor)  # Number of output channels
     print('D=',D)
     if D < len(feature_input_tensor):
         print('D=',D)
@@ -214,10 +214,10 @@ def compute_features(data_knn, grid, feature_input_tensor, feature_output_tensor
 
 
 
-    # Выделяем память под выходной тензор
+    # Allocate memory for output tensor
     data_result = np.zeros((M, M, C), dtype=np.float32)
 
-    # Извлекаем индексы входных каналов
+    # Extract input channel indices
     idx_x = feature_input_tensor["x"]
     idx_y = feature_input_tensor["y"]
     idx_z = feature_input_tensor["z"]
@@ -226,42 +226,42 @@ def compute_features(data_knn, grid, feature_input_tensor, feature_output_tensor
     idx_b = feature_input_tensor["b"]
     idx_class = feature_input_tensor["class"]
 
-    # --- Вычисляем признаки ---
+    # --- Compute features ---
     
-    # z_mean: среднее значение по оси K для z-координаты
+    # z_mean: mean value along K axis for z-coordinate
     if "z_mean" in feature_output_tensor:
         z_feature = np.mean(data_knn[:, :, :, idx_z], axis=2)
 
-        # # Сглаживание профиля
-        window_size = 512  # Задайте подходящее окно
+        # # Profile smoothing
+        window_size = 512  # Set appropriate window
         smoothed_profile = smooth_2d(z_feature, window_size)
 
-        # # Коррекция фичи: вычитание сглаженного профиля и приведение к неотрицательному виду
+        # # Feature correction: subtract smoothed profile and make non-negative
         z_feature_adjusted = z_feature - smoothed_profile
         z_feature_adjusted -= np.min(z_feature_adjusted)
 
-        # Сохранение результата в итоговый тензор
+        # Save result to final tensor
         data_result[:, :, feature_output_tensor["z_mean"]] = z_feature_adjusted
     
-    # z_std: стандартное отклонение по оси K для z-координаты
+    # z_std: standard deviation along K axis for z-coordinate
     if "z_std" in feature_output_tensor:
         data_result[:, :, feature_output_tensor["z_std"]] = np.std(data_knn[:, :, :, idx_z], axis=2)
 
-    # z_std: стандартное отклонение по оси K для z-координаты
+    # n_r: radial component of surface normal
     if "n_r" in feature_output_tensor:
         std_x = np.std(data_knn[:, :, :, idx_x], axis=2)
         std_y = np.std(data_knn[:, :, :, idx_y], axis=2)
         std_z = np.std(data_knn[:, :, :, idx_z], axis=2)
         data_result[:, :, feature_output_tensor["n_r"]] = (std_x**2+std_y**2)**(1/2)/(std_x**2+std_y**2+std_z**2)**(1/2)
 
-    # z_std: стандартное отклонение по оси K для z-координаты
+    # n_z: vertical component of surface normal
     if "n_z" in feature_output_tensor:
         std_x = np.std(data_knn[:, :, :, idx_x], axis=2)
         std_y = np.std(data_knn[:, :, :, idx_y], axis=2)
         std_z = np.std(data_knn[:, :, :, idx_z], axis=2)
         data_result[:, :, feature_output_tensor["n_z"]] = std_z/(std_x**2+std_y**2+std_z**2)**(1/2)                
     
-    # dist_mean: среднее расстояние от K соседей до центральной точки из grid
+    # dist_mean: mean distance from K neighbors to central point from grid
     if "dist_mean" in feature_output_tensor:
         dist = np.sqrt(
             (data_knn[:, :, :, idx_x] - grid[:, :, 0, None]) ** 2 +
@@ -269,7 +269,7 @@ def compute_features(data_knn, grid, feature_input_tensor, feature_output_tensor
         )
         data_result[:, :, feature_output_tensor["dist_mean"]] = np.mean(dist, axis=2)
     
-    # r, g, b: мода значений среди K соседей (оптимизированный вариант)
+    # r, g, b: mode of values among K neighbors (optimized version)
     # if "r" in feature_output_tensor:
     #     data_result[:, :, feature_output_tensor["r"]] = fast_mode(data_knn[:, :, :, idx_r])
     # if "g" in feature_output_tensor:
@@ -291,7 +291,7 @@ def compute_features(data_knn, grid, feature_input_tensor, feature_output_tensor
     # if "b" in feature_output_tensor:
     #     data_result[:, :, feature_output_tensor["b"]] = fast_median(data_knn[:, :, :, idx_b])        
 
-    #class: мода среди K соседей
+    # class: mode among K neighbors
     if "class" in feature_output_tensor:
         data_result[:, :, feature_output_tensor["class"]] = data_knn[:, :, 0, idx_class]
         print(data_knn[:, :, :, idx_class])
@@ -304,23 +304,26 @@ def main_parallel_transform_to_tensor(input_directory, output_directory,
                                            num_points_lim, M, K):
     
     """
-    Параллельная нарезка всех LAS-файлов в директории.
+    Parallel processing of all LAS files in directory.
 
-    :param input_directory: Директория с исходными LAS-файлами
-    :param output_directory: Директория для сохранения нарезанных файлов
-    :param tile_size: Размер tile (в метрах)
-    :param num_processes: Количество процессов для параллельной обработки
+    :param input_directory: Directory with source LAS files
+    :param output_directory: Directory to save processed files
+    :param feature_input_tensor: Input tensor configuration
+    :param feature_output_tensor: Output tensor configuration
+    :param num_points_lim: Point limit per file
+    :param M: Tensor size
+    :param K: Number of nearest neighbors
     """
-    # Создаем выходную директорию, если ее нет
+    # Create output directory if it doesn't exist
     os.makedirs(output_directory, exist_ok=True)
 
-    # Получаем список файлов .las
+    # Get list of .las files
     filenames = [f for f in os.listdir(input_directory) if f.endswith('.las')]
 
-    # Получаем информацию о памяти
+    # Get memory information
     #mem = psutil.virtual_memory()
 
-    # Доступная память в байтах
+    # Available memory in bytes
     #mem_for_tensor_needed = 2
     #available_memory = mem.available
     #how_many_possible_processors = max(1, int(np.floor(available_memory/ (1024 ** 3)/2)))
@@ -337,17 +340,20 @@ def main_not_parallel_transform_to_tensor(input_directory, output_directory,
                                            num_points_lim, M, K):
     
     """
-    Параллельная нарезка всех LAS-файлов в директории.
+    Sequential processing of all LAS files in directory.
 
-    :param input_directory: Директория с исходными LAS-файлами
-    :param output_directory: Директория для сохранения нарезанных файлов
-    :param tile_size: Размер tile (в метрах)
-    :param num_processes: Количество процессов для параллельной обработки
+    :param input_directory: Directory with source LAS files
+    :param output_directory: Directory to save processed files
+    :param feature_input_tensor: Input tensor configuration
+    :param feature_output_tensor: Output tensor configuration
+    :param num_points_lim: Point limit per file
+    :param M: Tensor size
+    :param K: Number of nearest neighbors
     """
-    # Создаем выходную директорию, если ее нет
+    # Create output directory if it doesn't exist
     os.makedirs(output_directory, exist_ok=True)
 
-    # Получаем список файлов .las
+    # Get list of .las files
     filenames = [f for f in os.listdir(input_directory) if f.endswith('.las')]
 
     for filename in filenames:
@@ -365,13 +371,13 @@ def process_transform(filename, input_directory, output_directory,
     data_knn, grid = get_knn_data(data_org, M, K)
     print(f'file {filename} is processing')
     data_result = compute_features(data_knn, grid, feature_input_tensor, feature_output_tensor)
-    np.save(output_file, data_result)  # Сохранение
+    np.save(output_file, data_result)  # Save
 
 if __name__ == "__main__":
     import config_preprocessing as cp
     import time
-    #input_directory = cp.path_input_las_for_2d  # Указать путь к каталогу с LAS-файлами
-    input_directory = cp.path_input_las_for_2d  # Указать путь к каталогу с LAS-файлами
+    #input_directory = cp.path_input_las_for_2d  # Path to directory with LAS files
+    input_directory = cp.path_input_las_for_2d  # Path to directory with LAS files
     output_directory = cp.path_out_tensors
     M = cp.M_tensor_size
     K = cp.K_nn
