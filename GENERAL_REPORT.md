@@ -587,7 +587,7 @@ The system provides a solid foundation for future development and has significan
 
 ---
 
-**Report Prepared By**: AI Assistant  
+**Report Prepared By**: Alexey Kozhakin  
 **Date**: January 2025  
 **Version**: 1.0  
 **Status**: Final Report 
