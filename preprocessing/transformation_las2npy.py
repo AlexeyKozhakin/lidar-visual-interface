@@ -6,50 +6,50 @@ from scipy.ndimage import uniform_filter
 
 
 def smooth_2d(data, window_size):
-    """Выполняет двумерное сглаживание массива с отражением границ."""
+    """Performs 2D smoothing of array with boundary reflection."""
     return uniform_filter(data, size=window_size, mode='reflect')
 
 def get_mesh_grid(data, M):
     """
-    Создает равномерную сетку размером M x M для данных (x, y).
+    Creates uniform grid of size M x M for (x, y) data.
     
-    data: numpy массив размерности (N, 2) — координаты (x, y).
-    M: размер сетки (M x M).
+    data: numpy array of dimension (N, 2) — coordinates (x, y).
+    M: grid size (M x M).
     
-    Возвращает:
-    numpy массив размерности (M, M, 2), содержащий координаты сетки (x, y).
+    Returns:
+    numpy array of dimension (M, M, 2), containing grid coordinates (x, y).
     """
-    # Извлекаем координаты x и y
+    # Extract x and y coordinates
     x_coords = data[:, 0]
     y_coords = data[:, 1]
 
-    # Определяем границы сетки
+    # Define grid boundaries
     x_min, x_max = np.min(x_coords), np.max(x_coords)
     y_min, y_max = np.min(y_coords), np.max(y_coords)
 
-    # Создаем равномерные координаты сетки
+    # Create uniform grid coordinates
     x_grid = np.linspace(x_min, x_max, M)
     y_grid = np.linspace(y_min, y_max, M)
 
-    # Создаем meshgrid и объединяем x и y координаты
+    # Create meshgrid and combine x and y coordinates
     x_mesh, y_mesh = np.meshgrid(x_grid, y_grid)
 
-    # Объединяем x и y координаты вдоль последней оси
-    grid = np.stack((x_mesh, y_mesh), axis=-1)  # Размерность (M, M, 2)
+    # Combine x and y coordinates along the last axis
+    grid = np.stack((x_mesh, y_mesh), axis=-1)  # Dimension (M, M, 2)
 
     return grid
 
 
-def load_las_to_numpy(file_path, num_points_lim=4096):
+def load_las_to_numpy(file_path, num_points_lim=4096, log_path="log.txt"):
     """
-    Обрабатывает один LAS файл и возвращает выборку точек и классов в виде numpy-массивов.
-    file_path: Путь к LAS файлу.
-    num_points_lim: Количество точек для выборки.
+    Processes one LAS file and returns a sample of points and classes as numpy arrays.
+    file_path: Path to LAS file.
+    num_points_lim: Number of points to sample.
     """
     try:
         las = laspy.read(file_path)
 
-        # Находим максимальное значение среди всех цветовых каналов
+        # Find maximum value among all color channels
         max_color_value = np.max([(np.max(las.red-np.min(las.red))), 
                                   np.max(las.green - np.min(las.green)), 
                                   np.max(las.blue - np.min(las.blue))])
@@ -57,32 +57,53 @@ def load_las_to_numpy(file_path, num_points_lim=4096):
         print('max_colour channel =', max_color_value)
         print('min_colour channel =', min_color_value)
 
-        # Извлечение координат и цветовых данных
+        # Extract coordinates and color data
         points = np.vstack((
-            las.x - np.min(las.x),                 # Нормировка X
-            las.y - np.min(las.y),                 # Нормировка Y
-            las.z - np.min(las.z),                 # Нормировка Z
-            (las.red - np.min(las.red)) / max_color_value * 256,       # Нормировка цвета (R)
-            (las.green - np.min(las.green))/ max_color_value * 256,     # Нормировка цвета (G)
-            (las.blue - np.min(las.blue))/ max_color_value * 256       # Нормировка цвета (B)
-        )).T  # Размерность (N, 6)
+            las.x - np.min(las.x),                 # Normalize X
+            las.y - np.min(las.y),                 # Normalize Y
+            las.z - np.min(las.z),                 # Normalize Z
+            (las.red - np.min(las.red)) / max_color_value * 256,       # Normalize color (R)
+            (las.green - np.min(las.green))/ max_color_value * 256,     # Normalize color (G)
+            (las.blue - np.min(las.blue))/ max_color_value * 256       # Normalize color (B)
+        )).T  # Dimension (N, 6)
 
-        # Извлечение классов
-        classes = np.array(las.classification, dtype=np.int64)  # Массив с классами (N,)
+        # Extract classes
+        classes = np.array(las.classification, dtype=np.int64)  # Array with classes (N,)
 
-        # Проверка количества точек
+        # Check number of points
         num_points = points.shape[0]
+        # if num_points > num_points_lim:
+        #     # Случайная выборка точек
+        #     indices = np.random.choice(num_points, num_points_lim, replace=False)
+        #     sampled_points = points[indices]
+        #     sampled_classes = classes[indices]
+
+        #     # Объединяем координаты и классы
+        #     return np.hstack((sampled_points, sampled_classes.reshape(-1, 1)))  # (num_points_lim, 7)
+        # else:
+        #     print(f"Количество точек в файле меньше лимита {num_points_lim}, пропуск файла.")
+        #     return None
         if num_points > num_points_lim:
             # Случайная выборка точек
             indices = np.random.choice(num_points, num_points_lim, replace=False)
             sampled_points = points[indices]
             sampled_classes = classes[indices]
-
-            # Объединяем координаты и классы
-            return np.hstack((sampled_points, sampled_classes.reshape(-1, 1)))  # (num_points_lim, 7)
+            return np.hstack((sampled_points, sampled_classes.reshape(-1, 1)))
+        
         else:
-            print(f"Количество точек в файле меньше лимита {num_points_lim}, пропуск файла.")
-            return None
+            # Logging and message
+            msg = f"File '{file_path}': number of points ({num_points}) is less than limit ({num_points_lim}). Resampling will be performed."
+            print(msg)
+            
+            # Write to log file
+            with open(log_path, "a", encoding="utf-8") as log_file:
+                log_file.write(msg + "\n")
+
+            # Resampling with replacement
+            indices = np.random.choice(num_points, num_points_lim, replace=True)
+            sampled_points = points[indices]
+            sampled_classes = classes[indices]
+            return np.hstack((sampled_points, sampled_classes.reshape(-1, 1)))        
     except Exception as e:
         print(f"Ошибка при обработке файла {file_path}: {e}")
         return None
@@ -91,43 +112,43 @@ from scipy.spatial import cKDTree
 
 def get_knn_data(data, M, K):
     """
-    Поиск K ближайших соседей для равномерной сетки точек.
+    Search for K nearest neighbors for uniform grid of points.
     
     Args:
-        data (np.ndarray): Входной тензор размером (N, 7), где N — количество точек.
-        M (int): Размер сетки (MxM).
-        K (int): Количество ближайших соседей.
+        data (np.ndarray): Input tensor of size (N, 7), where N is number of points.
+        M (int): Grid size (MxM).
+        K (int): Number of nearest neighbors.
 
     Returns:
         tuple: 
-            - np.ndarray: Тензор ближайших соседей размером (M, M, 7, K).
-            - np.ndarray: Сетка координат размером (M, M, 2).
+            - np.ndarray: Tensor of nearest neighbors of size (M, M, 7, K).
+            - np.ndarray: Coordinate grid of size (M, M, 2).
     """
     N, D = data.shape
-    assert 3 <= D <= 7, "Тензор `data` должен иметь от 3 до 7 признаков (x, y, z, r, g, b, class)."
+    assert 3 <= D <= 7, "Tensor `data` must have from 3 to 7 features (x, y, z, r, g, b, class)."
     
-    # Минимальные и максимальные значения координат x и y
+    # Minimum and maximum values of x and y coordinates
     x_min, x_max = np.min(data[:, 0]), np.max(data[:, 0])
     y_min, y_max = np.min(data[:, 1]), np.max(data[:, 1])
     
-    # Генерация равномерной сетки (M, M, 2)
+    # Generate uniform grid (M, M, 2)
     x_lin = np.linspace(x_min, x_max, M)
     y_lin = np.linspace(y_min, y_max, M)
     grid_x, grid_y = np.meshgrid(x_lin, y_lin)
     grid = np.stack([grid_x, grid_y], axis=-1)  # (M, M, 2)
 
-    # Подготовка данных для KD-дерева
+    # Prepare data for KD-tree
     data_coords = data[:, :2]  # (N, 2)
     tree = cKDTree(data_coords)
 
-    # Поиск K ближайших соседей для каждой точки сетки (M*M, 2)
+    # Search for K nearest neighbors for each grid point (M*M, 2)
     grid_flat = grid.reshape(-1, 2)
     dists, knn_indices = tree.query(grid_flat, k=K)  # (M*M, K)
 
-    # Извлечение данных ближайших соседей (M*M, K, D)
+    # Extract nearest neighbor data (M*M, K, D)
     knn_data = data[knn_indices]  # (M*M, K, D)
 
-    # Преобразование к форме (M, M, 7, K)
+    # Transform to shape (M, M, 7, K)
     knn_data = knn_data.reshape(M, M, K, D)#.transpose(0, 1, 3, 2)  # (M, M, D, K)
 
     return knn_data, grid

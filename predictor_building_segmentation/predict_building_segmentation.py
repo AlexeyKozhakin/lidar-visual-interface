@@ -12,7 +12,7 @@ class PredictionDataset(Dataset):
     def __init__(self, image_dir, transform=None):
         self.image_dir = Path(image_dir)
         self.transform = transform
-        self.image_filenames = sorted(self.image_dir.glob("*.png"))  # Или другое расширение
+        self.image_filenames = sorted(self.image_dir.glob("*.png"))  # Or other extension
 
     def __len__(self):
         return len(self.image_filenames)
@@ -29,27 +29,27 @@ import torch
 import segmentation_models_pytorch as smp
 
 def load_model(checkpoint_path, device="cpu"):
-    # Путь к весам encoder
+    # Path to encoder weights
     encoder_weights_path = "predictor_building_segmentation/model/resnet34-333f7ec4.pth"
     
-    # Загружаем веса encoder из .pth-файла (обязательно: weights_only=False)
+    # Load encoder weights from .pth file (required: weights_only=False)
     encoder_state_dict = torch.load(encoder_weights_path, weights_only=False)
 
-    # Создаем модель с отключенной автоматической загрузкой весов
+    # Create model with disabled automatic weight loading
     model = smp.Unet(
         encoder_name="resnet34",
-        encoder_weights=None,  # чтобы не скачивались веса с интернета
+        encoder_weights=None,  # to avoid downloading weights from internet
         in_channels=3,
         classes=2
     )
 
-    # Загружаем encoder вручную
+    # Load encoder manually
     model.encoder.load_state_dict(encoder_state_dict)
 
-    # Загружаем обученные веса всей модели (Unet) из чекпойнта
+    # Load trained weights of entire model (Unet) from checkpoint
     model.load_state_dict(torch.load(checkpoint_path, map_location=device))
 
-    # Отправляем на устройство и в режим оценки
+    # Send to device and set to evaluation mode
     model.to(device)
     model.eval()
 
@@ -62,12 +62,12 @@ def predict_and_save(model, dataloader, save_dir, device="cpu"):
     with torch.no_grad():
         for images, filenames in dataloader:
             images = images.to(device)
-            outputs = model(images)  # Предсказание
-            preds = torch.argmax(outputs, dim=1).cpu().numpy()  # Берем класс с наибольшей вероятностью
+            outputs = model(images)  # Prediction
+            preds = torch.argmax(outputs, dim=1).cpu().numpy()  # Take class with highest probability
             
             for pred, filename in zip(preds, filenames):
-                pred_image = (pred * 255).astype(np.uint8)  # Масштабируем в [0, 255]
-                pred_pil = Image.fromarray(pred_image, mode="L")  # Ч/б изображение
+                pred_image = (pred * 255).astype(np.uint8)  # Scale to [0, 255]
+                pred_pil = Image.fromarray(pred_image, mode="L")  # B/W image
                 pred_pil.save(os.path.join(save_dir, filename))
 
 def main_prediction(input_directory, output_directory, checkpoint_path):

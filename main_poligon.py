@@ -1,4 +1,3 @@
-#import streamlit as st
 import os
 import numpy as np
 from PIL import Image
@@ -17,18 +16,18 @@ from postprocessing.join_img import main_join_img
 
 # ============= Set up all temp folders for processing =======================
 save_dir = cp.path_las_before_cut
-os.makedirs(save_dir, exist_ok=True) # folder for las
-os.makedirs(cp.path_out_tensors, exist_ok=True) # folder for tensors
-os.makedirs(cp.path_image_features, exist_ok=True) # folder for images features
-os.makedirs(cp.path_image_rgb, exist_ok=True) # folder for images rgb
-os.makedirs(cpost.path_image_features_join, exist_ok=True) # folder for join image features
-os.makedirs(cpost.path_image_rgb_join, exist_ok=True) # folder for join image rgb
+os.makedirs(save_dir, exist_ok=True)  # folder for las
+os.makedirs(cp.path_out_tensors, exist_ok=True)  # folder for tensors
+os.makedirs(cp.path_image_features, exist_ok=True)  # folder for images features
+os.makedirs(cp.path_image_rgb, exist_ok=True)  # folder for images rgb
+os.makedirs(cpost.path_image_features_join, exist_ok=True)  # folder for join image features
+os.makedirs(cpost.path_image_rgb_join, exist_ok=True)  # folder for join image rgb
 
-os.makedirs(cpred.output_img_segment_buildings_predict, exist_ok=True) # folder for join image rgb
-os.makedirs(cpost.path_image_prediction_join, exist_ok=True) # folder for join image rgb
+os.makedirs(cpred.output_img_segment_buildings_predict, exist_ok=True)  # folder for join image rgb
+os.makedirs(cpost.path_image_prediction_join, exist_ok=True)  # folder for join image rgb
 
-os.makedirs(cpg.path_image_contours, exist_ok=True) # folder for join image rgb
-os.makedirs(cpg.path_polygons_shp, exist_ok=True) # folder for join image rgb
+os.makedirs(cpg.path_image_contours, exist_ok=True)  # folder for join image rgb
+os.makedirs(cpg.path_polygons_shp, exist_ok=True)  # folder for join image rgb
 
 # =================== Main functions (Needs to move to special module) =========
 def load_las_files(uploaded_files):
@@ -90,17 +89,8 @@ if st.button("Split on 250m x 250m"):
     output_directory = cp.path_las_after_cut
     main_parallel_cut_tiles(input_directory, output_directory, tile_size=250)
 
-
 if st.button("Generate Features"):
     process_pipeline()
-
-# ====================================== Check for existing tensor files ===============================
-#show_existing_files(cp.path_out_tensors, name='Tensors', ext='.npy')
-
-# if "processed_images" in st.session_state and st.session_state.processed_images:
-#     st.subheader("Processed Images")
-#     for img in st.session_state.processed_images:
-#         st.image(img, caption="Processed Image", use_column_width=True)
 
 # ======================================= Generate Features Images ============================================
 if st.button("Generate Feature Images"):
@@ -108,7 +98,8 @@ if st.button("Generate Feature Images"):
     input_folder = cp.path_image_features
     output_file = cpost.path_image_features_join
     main_join_img(input_folder, output_file)
-    # ====================================== Check for existing feature image files ===============================
+
+# ====================================== Check for existing feature image files ===============================
 show_existing_files(cpost.path_image_features_join, name='Feature Images', ext='.png')
 
 # ======================================= Generate RGB Images ============================================
@@ -136,12 +127,12 @@ show_existing_files(cpost.path_image_prediction_join, name='Predict Data Images'
 
 # =======================================  Generate polygons ============================================
 if st.button("Generate Polygons"):
-    # 📁 Путь к папкам из config
+    # Path to folders from config
     input_dir = cpost.path_image_prediction_join
     output_image_dir = cpg.path_image_contours
     output_shp_dir = cpg.path_polygons_shp
 
-    # ⚙️ Запуск обработки
+    # Run processing
     main_polygon_generator(input_dir, output_image_dir, output_shp_dir,
                       min_area=cpg.min_area, contour_thickness=cpg.contour_thickness)
 

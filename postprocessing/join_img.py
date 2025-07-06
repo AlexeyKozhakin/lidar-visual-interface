@@ -5,7 +5,7 @@ from PIL import Image
 
 def parse_coordinates(filename):
     """
-    Извлекает координаты из имени файла, например: '453000_3974000.png'.
+    Extracts coordinates from filename, e.g.: '453000_3974000.png'.
     """
     base = os.path.basename(filename)
     name, _ = os.path.splitext(base)
@@ -15,7 +15,7 @@ def parse_coordinates(filename):
 
 def stitch_images(input_folder, output_file):
     """
-    Склеивает изображения из папки на основе их нумерации.
+    Stitches images from folder based on their numbering.
     """
     files = [f for f in os.listdir(input_folder) if f.endswith('.png')]
     coordinates = {}
@@ -25,13 +25,13 @@ def stitch_images(input_folder, output_file):
         coordinates[(x, y)] = file
 
     if not coordinates:
-        raise ValueError("В папке нет изображений для склейки")
+        raise ValueError("No images in folder for stitching")
 
     x_coords = sorted({x for x, y in coordinates.keys()})
     y_coords = sorted({y for x, y in coordinates.keys()})
 
     if len(x_coords) < 1 or len(y_coords) < 1:
-        raise ValueError("Недостаточно координат для определения сетки")
+        raise ValueError("Insufficient coordinates to determine grid")
 
     step_x = x_coords[1] - x_coords[0] if len(x_coords) > 1 else 0
     step_y = y_coords[1] - y_coords[0] if len(y_coords) > 1 else 0
@@ -51,7 +51,7 @@ def stitch_images(input_folder, output_file):
     final_image = Image.new('RGB', (final_width, final_height))
     default_tile = Image.new('RGB', (tile_width, tile_height), (0, 0, 0))
 
-    for y in tqdm(range(num_y), desc="Склеивание строк"):
+    for y in tqdm(range(num_y), desc="Stitching rows"):
         for x in range(num_x):
             coord_x = min_x + x * step_x
             coord_y = min_y + y * step_y
@@ -68,7 +68,7 @@ def stitch_images(input_folder, output_file):
 
     output_path = os.path.join(output_file, 'joined.png')
     final_image.save(output_path)
-    print(f"Склеенное изображение сохранено как '{output_path}'")
+    print(f"Stitched image saved as '{output_path}'")
 
 def main_join_img(input_folder, output_file):
     if not os.path.exists(output_file):

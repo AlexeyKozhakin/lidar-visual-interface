@@ -1,3 +1,11 @@
+img_predict/
+log.txt
+polygons_shp/
+predictor_multiclass_segmentation/
+project_*
+tensors/
+
+
 test
 temp*
 output_tiles/

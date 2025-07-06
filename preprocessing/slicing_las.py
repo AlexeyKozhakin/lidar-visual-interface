@@ -4,45 +4,45 @@ from multiprocessing import Pool
 
 def process_file_cut_tiles(filename, input_directory, output_directory, tile_size=64):
     """
-    Нарезает один LAS-файл на tiles с помощью lastile.
+    Cuts one LAS file into tiles using lastile.
 
-    :param filename: Имя обрабатываемого LAS-файла
-    :param input_directory: Директория с исходными файлами
-    :param output_directory: Директория для сохранения нарезанных файлов
-    :param tile_size: Размер tile (в метрах)
+    :param filename: Name of the LAS file to process
+    :param input_directory: Directory with source files
+    :param output_directory: Directory to save cut files
+    :param tile_size: Tile size (in meters)
     """
     input_file = os.path.join(input_directory, filename)
     name, _ = os.path.splitext(filename)
     output_subdir = os.path.join(output_directory, name)
-    # Создаем подкаталог для текущего файла, если он не существует
+    # Create subdirectory for current file if it doesn't exist
     os.makedirs(output_subdir, exist_ok=True)
 
-    # Формируем команду для lastile
+    # Form lastile command
     command = [
         'lastile',
-        '-i', input_file,        # Входной файл
-        '-tile_size', str(tile_size),  # Размер tiles
-        '-o', output_subdir       # Директория сохранения
+        '-i', input_file,        # Input file
+        '-tile_size', str(tile_size),  # Tile size
+        '-o', output_subdir       # Save directory
     ]
 
-    # Выполняем команду
+    # Execute command
     subprocess.run(command)
-    print(f"[✔] {filename} успешно нарезан и сохранен в {output_subdir}")
+    print(f"[✔] {filename} successfully cut and saved to {output_subdir}")
     os.rmdir(output_subdir)
 
 def main_parallel_cut_tiles(input_directory, output_directory, tile_size=64):
     """
-    Параллельная нарезка всех LAS-файлов в директории.
+    Parallel cutting of all LAS files in directory.
 
-    :param input_directory: Директория с исходными LAS-файлами
-    :param output_directory: Директория для сохранения нарезанных файлов
-    :param tile_size: Размер tile (в метрах)
-    :param num_processes: Количество процессов для параллельной обработки
+    :param input_directory: Directory with source LAS files
+    :param output_directory: Directory to save cut files
+    :param tile_size: Tile size (in meters)
+    :param num_processes: Number of processes for parallel processing
     """
-    # Создаем выходную директорию, если ее нет
+    # Create output directory if it doesn't exist
     os.makedirs(output_directory, exist_ok=True)
 
-    # Получаем список файлов .las
+    # Get list of .las files
     filenames = [f for f in os.listdir(input_directory) if f.endswith('.las')]
 
     num_processes = min(os.cpu_count(), len(filenames))
@@ -53,13 +53,13 @@ def main_parallel_cut_tiles(input_directory, output_directory, tile_size=64):
 if __name__ == "__main__":
     import config_preprocessing as cp
     import time
-    input_directory = cp.path_las_before_cut  # Указать путь к каталогу с LAS-файлами
-    output_directory = cp.path_las_after_cut  # Указать путь к каталогу с LAS-файлами
-    # Создаем выходную директорию, если она не существует
+    input_directory = cp.path_las_before_cut  # Path to directory with LAS files
+    output_directory = cp.path_las_after_cut  # Path to directory with LAS files
+    # Create output directory if it doesn't exist
     if not os.path.exists(output_directory):
         os.makedirs(output_directory)
     start = time.time()
-    # Запуск нарезки в 4 потока
+    # Run cutting in 4 threads
     main_parallel_cut_tiles(input_directory, output_directory, tile_size=cp.las_cut_size)
     end = time.time()
     print(round((end-start)/60,1))

@@ -8,21 +8,21 @@ def show_existing_files(save_dir, name='las files', ext='.las'):
         st.info(f"Generated {name} from last session:")
 
         for file in existing_files:
-            col1, col2, col3 = st.columns([0.7, 0.15, 0.15])  # Три колонки: имя файла, кнопка удаления, кнопка просмотра
+            col1, col2, col3 = st.columns([0.7, 0.15, 0.15])  # Three columns: filename, delete button, view button
 
             with col1:
-                st.text(file)  # Отображаем имя файла
+                st.text(file)  # Display filename
 
             with col2:
-                if st.button("❌", key=file+name):  # Кнопка удаления с уникальным ключом
+                if st.button("❌", key=file+name):  # Delete button with unique key
                     file_path = os.path.join(save_dir, file)
-                    os.remove(file_path)  # Удаляем файл
-                    st.rerun()  # Перезапускаем скрипт, чтобы обновить список файлов
+                    os.remove(file_path)  # Delete file
+                    st.rerun()  # Restart script to update file list
 
-            # Добавляем кнопку просмотра для изображений
+            # Add view button for images
             if ext == '.png':
                 if f"show_{file}" not in st.session_state:
-                    st.session_state[f"show_{file}"] = False  # Инициализация состояния
+                    st.session_state[f"show_{file}"] = False  # Initialize state
 
                 with col3:
                     if st.button("🔍", key='view_'+file+name):
@@ -31,8 +31,8 @@ def show_existing_files(save_dir, name='las files', ext='.las'):
                 if st.session_state[f"show_{file}"]:
                     file_path = os.path.join(save_dir, file)
                     image = Image.open(file_path)
-                    with st.expander(f"Просмотр {file}", expanded=True):
+                    with st.expander(f"View {file}", expanded=True):
                         st.image(image, caption=file, use_container_width=True)
-                        if st.button("Закрыть", key="close_" + file+name):
+                        if st.button("Close", key="close_" + file+name):
                             st.session_state[f"show_{file}"] = False
-                            st.rerun()  # Перезапускаем скрипт для скрытия изображения
+                            st.rerun()  # Restart script to hide image

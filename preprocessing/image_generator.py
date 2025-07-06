@@ -6,60 +6,45 @@ from multiprocessing import Pool
 
 def visual_tensor(input_dir, filename, feature_output_tensor, channels_visualisation, output_dir):
     """
-    Функция для визуализации и сохранения выбранных каналов тензора как изображения.
+    Function for visualizing and saving selected tensor channels as images.
 
-    Аргументы:
-    - input_dir: директория с входными данными (не используется в данной функции, но можно для логирования).
-    - filename: имя файла для сохранения изображений.
-    - data: тензор размерности (M, M, C), где C - количество каналов.
-    - feature_output_tensor: словарь, содержащий соответствие между названиями каналов и их индексами.
-    - channels_visualisation: словарь с названиями каналов для визуализации и их индексами в тензоре.
-    - output_dir: директория для сохранения изображений.
+    Arguments:
+    - input_dir: directory with input data (not used in this function, but can be used for logging).
+    - filename: filename for saving images.
+    - data: tensor of dimension (M, M, C), where C is number of channels.
+    - feature_output_tensor: dictionary containing mapping between channel names and their indices.
+    - channels_visualisation: dictionary with channel names for visualization and their indices in tensor.
+    - output_dir: directory for saving images.
     """
     file_path = os.path.join(input_dir, filename)
-    data = np.load(file_path)  # Загрузка
-    # Создаем выходную директорию, если она не существует
+    data = np.load(file_path)  # Loading
+    # Create output directory if it doesn't exist
     os.makedirs(output_dir, exist_ok=True)
 
-    # Сначала создаем пустое изображение для 3 канала (RGB)
+    # First create empty image for 3 channels (RGB)
     image_data = np.zeros((data.shape[0], data.shape[1], 3), dtype=np.uint8)
 
-    # Проходим по каналам, которые нужно визуализировать
+    # Iterate through channels that need to be visualized
     for channel_name, channel_idx in channels_visualisation.items():
         if channel_name in feature_output_tensor:
-            # Извлекаем нужный канал
+            # Extract required channel
             channel_data = data[:, :, feature_output_tensor[channel_name]]
-            print('chanle feature',feature_output_tensor[channel_name])
+            print('channel feature', feature_output_tensor[channel_name])
 
-            # Нормализация канала
+            # Channel normalization
             channel_data_normalized = channel_data / np.max(channel_data, axis=(0, 1), keepdims=True)*255
             #channel_data_normalized = channel_data
             print(channel_data_normalized.max())
             print(channel_data_normalized.min())
 
-            # Ограничение значений в диапазоне от 0 до 255 и преобразование в целые числа
+            # Limit values in range from 0 to 255 and convert to integers
             channel_data_normalized = np.clip(channel_data_normalized, 0, 255).astype(np.uint8)
 
-#            Записываем данные в соответствующий канал изображения (например, r, g, или b)
-            # if channel_name == "r":
-            #     image_data[:, :, 0] = channel_data_normalized  # Канал R
-            # elif channel_name == "g":
-            #     image_data[:, :, 1] = channel_data_normalized  # Канал G
-            # elif channel_name == "b":
-            #     image_data[:, :, 2] = channel_data_normalized  # Канал B
-
-            # if channel_name == "class":
-            #     image_data[:, :, 0] = channel_data_normalized  # Канал R
-            # elif channel_name == "class":
-            #     image_data[:, :, 1] = channel_data_normalized  # Канал G
-            # elif channel_name == "class":
-            #     image_data[:, :, 2] = channel_data_normalized  # Канал B                
-
-            #Записываем данные в соответствующий канал изображения (например, r, g, или b)
+            # Write data to corresponding image channel (e.g., r, g, or b)
             if channel_name == channel_name:
-                image_data[:, :, channels_visualisation[channel_name]] = channel_data_normalized  # Канал R
+                image_data[:, :, channels_visualisation[channel_name]] = channel_data_normalized  # Channel R
 
-                # Сохраняем изображение как PNG
+                # Save image as PNG
     name, _ = os.path.splitext(filename)            
     output_path = os.path.join(output_dir, f"{name}.png")
     img = Image.fromarray(image_data)
@@ -69,20 +54,20 @@ def main_parallel_tensor_to_image(input_dir, output_dir,
                                           feature_output_tensor, channels_visualisation):
     
     """
-    Параллельная нарезка всех LAS-файлов в директории.
+    Parallel processing of all tensor files in directory.
 
-    :param input_directory: Директория с исходными LAS-файлами
-    :param output_directory: Директория для сохранения нарезанных файлов
-    :param tile_size: Размер tile (в метрах)
-    :param num_processes: Количество процессов для параллельной обработки
+    :param input_dir: Directory with source tensor files
+    :param output_dir: Directory to save generated images
+    :param feature_output_tensor: Dictionary with feature tensor configuration
+    :param channels_visualisation: Dictionary with visualization channel configuration
     """
-    # Создаем выходную директорию, если ее нет
+    # Create output directory if it doesn't exist
     os.makedirs(output_dir, exist_ok=True)
 
-    # Получаем список файлов .las
+    # Get list of .npy files
     filenames = [f for f in os.listdir(input_dir) if f.endswith('.npy')]
 
-    num_processes = 1 #min(os.cpu_count(), len(filenames))
+    num_processes = 1  # min(os.cpu_count(), len(filenames))
     print(num_processes)
     print(os.cpu_count())
     print(len(filenames))
@@ -94,17 +79,17 @@ def main_not_parallel_tensor_to_image(input_dir, output_dir,
                                       feature_output_tensor, channels_visualisation):
     
     """
-    Параллельная нарезка всех LAS-файлов в директории.
+    Sequential processing of all tensor files in directory.
 
-    :param input_directory: Директория с исходными LAS-файлами
-    :param output_directory: Директория для сохранения нарезанных файлов
-    :param tile_size: Размер tile (в метрах)
-    :param num_processes: Количество процессов для параллельной обработки
+    :param input_dir: Directory with source tensor files
+    :param output_dir: Directory to save generated images
+    :param feature_output_tensor: Dictionary with feature tensor configuration
+    :param channels_visualisation: Dictionary with visualization channel configuration
     """
-    # Создаем выходную директорию, если ее нет
+    # Create output directory if it doesn't exist
     os.makedirs(output_dir, exist_ok=True)
 
-    # Получаем список файлов .las
+    # Get list of .npy files
     filenames = [f for f in os.listdir(input_dir) if f.endswith('.npy')]
 
     for filename in filenames:
@@ -115,19 +100,19 @@ if __name__ == "__main__":
     import time
     
     start = time.time()
-    # Пример вызова функции
+    # Example function call
     input_dir = cp.path_tensor_to_visual
     output_dir = cp.path_image
-    # Создаем выходную директорию, если ее нет
+    # Create output directory if it doesn't exist
     os.makedirs(output_dir, exist_ok=True)
 
-    # Получаем список файлов .npy
+    # Get list of .npy files
     filenames = [f for f in os.listdir(input_dir) if f.endswith('.npy')]
     print(filenames)
     for filename in filenames:
         file_path = os.path.join(input_dir, filename)
-        data = np.load(file_path)  # Загрузка
-        # Вызов функции для визуализации
+        data = np.load(file_path)  # Loading
+        # Call function for visualization
         visual_tensor(input_dir, filename,
                       cp.feature_input_tensor, 
                       cp.feature_output_tensor, cp.channels_visualisation, output_dir)

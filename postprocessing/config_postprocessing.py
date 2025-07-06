@@ -1,4 +1,4 @@
-# config_postprocessing.py
+# Configuration file for postprocessing pipeline
 
 # ===== join_tensors.py
 
@@ -6,15 +6,13 @@
 # path_joined_tensors = r"temp\img_predict_join"
 
 # ====== image_features_join
-path_image_features_join = r"temp\img_features_join"
-path_image_features = r"temp\img_features" # additional for test main path in preprocsessing
+path_image_features_join = r"img_features_join"
+path_image_features = r"img_features"  # additional for test main path in preprocessing
 
 # ====== image_rgb_join
-path_image_rgb_join = r"temp\img_rgb_join"
-
-
+path_image_rgb_join = r"img_rgb_join"
 
 # ====== image_predict_join
-path_image_prediction_join = r"temp\img_prediction_join"
+path_image_prediction_join = r"img_prediction_join"
 
 # ========
