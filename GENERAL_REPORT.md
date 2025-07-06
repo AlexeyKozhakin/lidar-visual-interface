@@ -230,8 +230,14 @@ The system includes two specialized machine learning models:
 ![Building Segmentation - Gozo Rabat](report_images/predictions/building_segmentation_results_gozo_rabat.png)
 *Figure 3.5c: Building segmentation results for Gozo Rabat area highlighting complex building structures*
 
-![Multi-class Segmentation](report_images/predictions/multiclass_segmentation_results.png)
-*Figure 3.6: Multi-class segmentation results with 20+ object classes*
+![Multi-class Segmentation - St. Pauls Bay](report_images/predictions/multiclass_segmentation_results_st_pauls_bay.png)
+*Figure 3.6a: Multi-class segmentation results for St. Pauls Bay area with 20+ object classes*
+
+![Multi-class Segmentation - Xewkija](report_images/predictions/multiclass_segmentation_results_xewkija.png)
+*Figure 3.6b: Multi-class segmentation results for Xewkija area demonstrating comprehensive object classification*
+
+![Multi-class Segmentation - Gozo Rabat](report_images/predictions/multiclass_segmentation_results_gozo_rabat.png)
+*Figure 3.6c: Multi-class segmentation results for Gozo Rabat area showing detailed object segmentation*
 
 #### Post-processing Results
 ![Stitched Images](report_images/postprocessing/stitched_prediction.png)

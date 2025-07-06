@@ -12,8 +12,10 @@ from preprocessing.slicing_las_python import main_not_parallel_cut_tiles
 import preprocessing.config_preprocessing as cp
 import postprocessing.config_postprocessing as cpost
 import predictor_building_segmentation.config_prediction as cpred
+import predictor_multiclass_segmentation.config_prediction as cmulticlass
 import polygon_generator.config_polygon_generator as cpg
 from predictor_building_segmentation.predict_building_segmentation import main_prediction
+from predictor_multiclass_segmentation.predict_multiclass_segmentation import main_prediction as main_multiclass_prediction
 from polygon_generator.polygon_generator import main_polygon_generator
 from postprocessing.join_img import main_join_img
 import ctypes
@@ -56,11 +58,15 @@ class LASApp(tk.Tk):
 
         button_width = 30  # Количество символов по ширине
 
-        self.new_project_btn = ttk.Button(self, text="📁 Create New Project Folder", command=self.create_new_project, width=button_width)
-        self.new_project_btn.pack(pady=(15, 5), anchor='center')
+
 
         self.upload_btn = ttk.Button(self, text="Upload LAS Files", command=self.upload_files, width=button_width)
         self.upload_btn.pack(pady=(15, 5), anchor='center')
+
+        # Галочка для мультиклассовой сегментации
+        self.multiclass_var = tk.BooleanVar()
+        self.multiclass_checkbox = ttk.Checkbutton(self, text="Enable Multi-class Segmentation", variable=self.multiclass_var)
+        self.multiclass_checkbox.pack(pady=(5, 5), anchor='center')
 
         self.pipeline_btn = ttk.Button(self, text="Run Full Pipeline", command=self.start_pipeline_thread, width=button_width)
         self.pipeline_btn.pack(pady=(15, 5), anchor='center')
@@ -114,6 +120,10 @@ class LASApp(tk.Tk):
                 command=lambda: self.open_folder(os.path.join(self.project_root, cpg.path_polygons_shp)),
                 width=button_width).grid(row=1, column=2, padx=5, pady=5, sticky="ew")
 
+        ttk.Button(dir_frame, text="📂 Multi-class Results",
+                command=lambda: self.open_folder(os.path.join(self.project_root, cmulticlass.output_directory_join)),
+                width=button_width).grid(row=2, column=0, padx=5, pady=5, sticky="ew")
+
         # Футер
         footer = ttk.Label(self, text="MUSAC Project", anchor="center", font=("Arial", 10, "italic"))
         footer.pack(side=tk.BOTTOM, pady=5)
@@ -125,19 +135,7 @@ class LASApp(tk.Tk):
         return os.path.join(base_dir, folder_name)
 
 
-    def create_new_project(self):
-        new_project_path = self.generate_project_path(os.getcwd())
 
-        try:
-            os.makedirs(new_project_path)
-            self.project_root = new_project_path
-            self.log(f"📂 Created new project folder: {new_project_path}")
-            messagebox.showinfo("Project Created", f"New project folder created:\n{new_project_path}")
-            self.setup_directories()
-
-        except Exception as e:
-            self.log(f"❌ Failed to create project folder: {e}")
-            messagebox.showerror("Error", str(e))
 
 
 
@@ -149,6 +147,14 @@ class LASApp(tk.Tk):
             cpg.path_image_contours, cpg.path_polygons_shp
         ]
         for d in dirs:
+            os.makedirs(os.path.join(self.project_root, d), exist_ok=True)
+        
+        # Создаем каталоги для мультиклассовой сегментации
+        multiclass_dirs = [
+            cmulticlass.output_directory,
+            cmulticlass.output_directory_join
+        ]
+        for d in multiclass_dirs:
             os.makedirs(os.path.join(self.project_root, d), exist_ok=True)
 
     def log(self, message):
@@ -163,12 +169,26 @@ class LASApp(tk.Tk):
     def upload_files(self):
         files = filedialog.askopenfilenames(filetypes=[("LAS files", "*.las")])
         if files:
-            for file_path in files:
-                dest_path = os.path.join(self.project_root, cp.path_las_before_cut, os.path.basename(file_path))
-                os.makedirs(os.path.join(self.project_root, cp.path_las_before_cut), exist_ok=True)
-                with open(file_path, "rb") as fsrc, open(dest_path, "wb") as fdst:
-                    fdst.write(fsrc.read())
-            self.log(f"Uploaded and saved {len(files)} LAS files.")
+            # Автоматически создаем новый каталог проекта при загрузке файлов
+            new_project_path = self.generate_project_path(os.getcwd())
+            try:
+                os.makedirs(new_project_path)
+                self.project_root = new_project_path
+                self.log(f"📂 Automatically created new project folder: {new_project_path}")
+                self.setup_directories()
+                
+                # Копируем файлы в новый каталог проекта
+                for file_path in files:
+                    dest_path = os.path.join(self.project_root, cp.path_las_before_cut, os.path.basename(file_path))
+                    os.makedirs(os.path.join(self.project_root, cp.path_las_before_cut), exist_ok=True)
+                    with open(file_path, "rb") as fsrc, open(dest_path, "wb") as fdst:
+                        fdst.write(fsrc.read())
+                
+                self.log(f"✅ Uploaded and saved {len(files)} LAS files to new project.")
+                
+            except Exception as e:
+                self.log(f"❌ Failed to create project folder: {e}")
+                messagebox.showerror("Error", str(e))
 
     def start_pipeline_thread(self):
         threading.Thread(target=self.run_full_pipeline, daemon=True).start()
@@ -227,7 +247,7 @@ class LASApp(tk.Tk):
             self.log(f"4. RGB images generated in {round(time.time() - start, 2)} sec.")
             self.set_progress(65)
 
-            self.log("5. Starting prediction...")
+            self.log("5. Starting building prediction...")
             main_prediction(os.path.join(self.project_root, cp.path_image_features),
                             os.path.join(self.project_root, cpred.output_img_segment_buildings_predict),
                             cpred.checkpoint_path_features)
@@ -235,7 +255,22 @@ class LASApp(tk.Tk):
                 os.path.join(self.project_root, cpred.output_img_segment_buildings_predict), 
                 os.path.join(self.project_root, cpost.path_image_prediction_join)
                              )
-            self.log("5. Prediction completed!")
+            self.log("5. Building prediction completed!")
+            
+            # Мультиклассовая сегментация (если включена)
+            if self.multiclass_var.get():
+                self.log("5a. Starting multi-class prediction...")
+                main_multiclass_prediction(
+                    os.path.join(self.project_root, cp.path_image_features),
+                    os.path.join(self.project_root, cmulticlass.output_directory),
+                    cmulticlass.checkpoint_path
+                )
+                main_join_img(
+                    os.path.join(self.project_root, cmulticlass.output_directory),
+                    os.path.join(self.project_root, cmulticlass.output_directory_join)
+                )
+                self.log("5a. Multi-class prediction completed!")
+            
             self.set_progress(85)
 
             self.log("6. Generating polygons...")
