@@ -26,6 +26,7 @@ from predictor_multiclass_segmentation.predict_multiclass_segmentation import ma
 from polygon_generator.polygon_generator import main_polygon_generator
 from postprocessing.join_img import main_join_img
 from generate_colored_las_3D.generate_colored_las_3D import mask_to_las_with_class_nn_rgb
+from generate_colored_las_3D.generate_class_las_3D import mask_to_las_with_class_only
 import generate_colored_las_3D.config_colored_las as ccl
 
 
@@ -48,13 +49,16 @@ class MainApp:
         
         # Project directory - will be set when files are uploaded
         self.project_dir = None
+        # Lists to store uploaded files
+        self.las_files = []
+        self.las_basenames = []
         
         self.init_ui()
 
     def init_ui(self):
         # Main frame
         main_frame = ttk.Frame(self.root, padding="10")
-        main_frame.grid(row=0, column=0, sticky=(tk.W, tk.E, tk.N, tk.S))
+        main_frame.grid(row=0, column=0, sticky="nsew")
         
         # Configure grid weights
         self.root.columnconfigure(0, weight=1)
@@ -63,60 +67,64 @@ class MainApp:
         main_frame.rowconfigure(4, weight=1)
         
         # Title
-        title_label = ttk.Label(main_frame, text="LiDAR 3D Classification System", 
+        title_label = ttk.Label(main_frame, text="LiDAR 3D Classification & Colored LAS System", 
                                font=('Arial', 16, 'bold'))
         title_label.grid(row=0, column=0, columnspan=2, pady=(0, 20))
         
         # Upload button
         self.upload_btn = ttk.Button(main_frame, text="Upload LAS Files", 
                                     command=self.upload_files)
-        self.upload_btn.grid(row=1, column=0, columnspan=2, pady=(0, 10), sticky=(tk.W, tk.E))
+        self.upload_btn.grid(row=1, column=0, columnspan=2, pady=(0, 10), sticky="ew")
         
         # Pipeline button
         self.pipeline_btn = ttk.Button(main_frame, text="Run Full Pipeline", 
                                       command=self.run_full_pipeline)
-        self.pipeline_btn.grid(row=2, column=0, columnspan=2, pady=(0, 10), sticky=(tk.W, tk.E))
+        self.pipeline_btn.grid(row=2, column=0, columnspan=2, pady=(0, 10), sticky="ew")
         
         # Open project folder button
         self.open_folder_btn = ttk.Button(main_frame, text="Open Project Folder", 
                                          command=self.open_project_folder, state=tk.DISABLED)
-        self.open_folder_btn.grid(row=3, column=0, columnspan=2, pady=(0, 10), sticky=(tk.W, tk.E))
+        self.open_folder_btn.grid(row=3, column=0, columnspan=2, pady=(0, 10), sticky="ew")
         
         # Progress section
         progress_frame = ttk.LabelFrame(main_frame, text="Progress", padding="5")
-        progress_frame.grid(row=4, column=0, columnspan=2, pady=(0, 10), sticky=(tk.W, tk.E))
+        progress_frame.grid(row=4, column=0, columnspan=2, pady=(0, 10), sticky="ew")
         progress_frame.columnconfigure(0, weight=1)
         
         self.progress_var = tk.DoubleVar()
         self.progress_bar = ttk.Progressbar(progress_frame, variable=self.progress_var, 
                                            maximum=100, length=400)
-        self.progress_bar.grid(row=0, column=0, sticky=(tk.W, tk.E), pady=5)
+        self.progress_bar.grid(row=0, column=0, sticky="ew", pady=5)
         
         self.progress_label = ttk.Label(progress_frame, text="Ready")
         self.progress_label.grid(row=1, column=0, pady=(0, 5))
         
         # Log section
         log_frame = ttk.LabelFrame(main_frame, text="Processing Log", padding="5")
-        log_frame.grid(row=5, column=0, columnspan=2, sticky=(tk.W, tk.E, tk.N, tk.S))
+        log_frame.grid(row=5, column=0, columnspan=2, sticky="nsew")
         log_frame.columnconfigure(0, weight=1)
         log_frame.rowconfigure(0, weight=1)
         
         # Create text widget with scrollbar
         text_frame = ttk.Frame(log_frame)
-        text_frame.grid(row=0, column=0, sticky=(tk.W, tk.E, tk.N, tk.S))
+        text_frame.grid(row=0, column=0, sticky="nsew")
         text_frame.columnconfigure(0, weight=1)
         text_frame.rowconfigure(0, weight=1)
         
         self.log_text = scrolledtext.ScrolledText(text_frame, height=20, width=80, 
                                                  wrap=tk.WORD, state=tk.DISABLED)
-        self.log_text.grid(row=0, column=0, sticky=(tk.W, tk.E, tk.N, tk.S))
+        self.log_text.grid(row=0, column=0, sticky="nsew")
         
         # Status bar
         self.status_var = tk.StringVar()
         self.status_var.set("Ready")
         status_bar = ttk.Label(main_frame, textvariable=self.status_var, 
                               relief=tk.SUNKEN, anchor=tk.W)
-        status_bar.grid(row=6, column=0, columnspan=2, sticky=(tk.W, tk.E), pady=(10, 0))
+        status_bar.grid(row=6, column=0, columnspan=2, sticky="ew", pady=(10, 0))
+
+    def normpath(self, *args):
+        """Return normalized absolute path (Windows/Unix safe)"""
+        return os.path.abspath(os.path.join(*args))
 
     def create_project_directory(self):
         """Create project directory with timestamp"""
@@ -133,16 +141,20 @@ class MainApp:
             
         # Create all subdirectories within project directory
         dirs = [
-            os.path.join(self.project_dir, "las"),
-            os.path.join(self.project_dir, "las_cut"),
-            os.path.join(self.project_dir, "tensors"),
-            os.path.join(self.project_dir, "img_features"),
-            os.path.join(self.project_dir, "img_features_join"),
-            os.path.join(self.project_dir, "img_rgb"),
-            os.path.join(self.project_dir, "img_rgb_join"),
-            os.path.join(self.project_dir, "img_predict_multi_class"),
-            os.path.join(self.project_dir, "img_predict_multi_class_join"),
-            os.path.join(self.project_dir, "las_colored")
+            self.normpath(self.project_dir, "las"),
+            self.normpath(self.project_dir, "las_cut"),
+            self.normpath(self.project_dir, "tensors"),
+            self.normpath(self.project_dir, "img_features"),
+            self.normpath(self.project_dir, "img_features_join"),
+            self.normpath(self.project_dir, "img_features_join_all"),
+            self.normpath(self.project_dir, "img_rgb"),
+            self.normpath(self.project_dir, "img_rgb_join"),
+            self.normpath(self.project_dir, "img_rgb_join_all"),
+            self.normpath(self.project_dir, "img_predict_multi_class"),
+            self.normpath(self.project_dir, "img_predict_multi_class_join"),
+            self.normpath(self.project_dir, "img_predict_multi_class_join_all"),
+            self.normpath(self.project_dir, "las_colored"),
+            self.normpath(self.project_dir, "las_with_class")
         ]
         for d in dirs:
             os.makedirs(d, exist_ok=True)
@@ -181,21 +193,24 @@ class MainApp:
             self.create_project_directory()
             self.setup_directories()
             
+            # Clear previous files
+            self.las_files.clear()
+            self.las_basenames.clear()
             uploaded_count = 0
             for file_path in files:
                 try:
-                    # Save files to project directory
-                    dest_path = os.path.join(self.project_dir, "las", os.path.basename(file_path))
-                    
+                    if self.project_dir is None:
+                        raise Exception("Project directory not created")
+                    dest_path = self.normpath(self.project_dir, "las", os.path.basename(file_path))
                     with open(file_path, "rb") as fsrc, open(dest_path, "wb") as fdst:
                         fdst.write(fsrc.read())
+                    self.las_files.append(dest_path)
+                    self.las_basenames.append(os.path.splitext(os.path.basename(file_path))[0])
                     uploaded_count += 1
                 except Exception as e:
                     self.log(f"Error uploading {os.path.basename(file_path)}: {e}")
-            
             self.log(f"Successfully uploaded {uploaded_count} LAS files to {self.project_dir}")
             self.status_var.set(f"Uploaded {uploaded_count} files to {self.project_dir}")
-            
             # Enable the open folder button
             self.open_folder_btn.config(state=tk.NORMAL)
 
@@ -224,123 +239,205 @@ class MainApp:
             self.status_var.set("No project folder")
 
     def split_tiles(self):
-        """Split LAS files into tiles"""
-        self.log("1. Splitting LAS files into tiles...")
+        """Split all LAS files into tiles (аналогично main_polygon_desktop_tk.py)"""
+        self.log("1. Splitting all LAS files into tiles...")
         try:
-            las_input = os.path.join(self.project_dir, "las")
-            las_cut_output = os.path.join(self.project_dir, "las_cut")
-            main_not_parallel_cut_tiles(las_input, las_cut_output, tile_size=250)
-            self.log("1. Splitting completed!")
+            if not self.project_dir:
+                raise Exception("Project directory not created. Please upload files first.")
+            input_dir = self.normpath(self.project_dir, "las")
+            output_dir = self.normpath(self.project_dir, "las_cut")
+            main_not_parallel_cut_tiles(input_dir, output_dir, tile_size=250)
+            self.log("1. Splitting completed for all files!")
             self.set_progress(15)
         except Exception as e:
             self.log(f"Error in splitting: {e}")
             raise
 
     def generate_features(self):
-        """Generate features from LAS data"""
-        self.log("2. Starting feature generation...")
+        """Generate features from all LAS tiles in las_cut"""
+        self.log("2. Starting feature generation for all tiles...")
         try:
+            if not self.project_dir:
+                raise Exception("Project directory not created. Please upload files first.")
             start = time.time()
-            las_input = os.path.join(self.project_dir, "las_cut")
-            tensors_output = os.path.join(self.project_dir, "tensors")
+            las_cut_dir = self.normpath(self.project_dir, "las_cut")
+            tensors_dir = self.normpath(self.project_dir, "tensors")
             main_not_parallel_transform_to_tensor(
-                las_input, tensors_output,
-                cp.feature_input_tensor, cp.feature_output_tensor, 
+                las_cut_dir, tensors_dir,
+                cp.feature_input_tensor, cp.feature_output_tensor,
                 cp.num_points_lim, cp.M_tensor_size, cp.K_nn
             )
             end = time.time()
-            self.log(f"2. Feature generation completed in {round(end - start, 2)} seconds.")
+            self.log(f"2. Feature generation for all tiles completed in {round(end - start, 2)} seconds.")
             self.set_progress(35)
         except Exception as e:
             self.log(f"Error in feature generation: {e}")
             raise
 
     def generate_feature_images(self):
-        """Generate feature images"""
-        self.log("3. Generating feature images...")
+        """Generate feature images for all tensors"""
+        self.log("3. Generating feature images for all tiles...")
         try:
+            if not self.project_dir:
+                raise Exception("Project directory not created. Please upload files first.")
             start = time.time()
-            tensors_input = os.path.join(self.project_dir, "tensors")
-            features_output = os.path.join(self.project_dir, "img_features")
-            features_join_output = os.path.join(self.project_dir, "img_features_join")
-            
-            main_not_parallel_tensor_to_image(tensors_input, features_output,
-                                              cp.feature_output_tensor, cp.channels_visualisation)
-            main_join_img(features_output, features_join_output)
+            tensors_dir = self.normpath(self.project_dir, "tensors")
+            features_output_dir = self.normpath(self.project_dir, "img_features")
+            os.makedirs(features_output_dir, exist_ok=True)
+            main_not_parallel_tensor_to_image(
+                tensors_dir, features_output_dir,
+                cp.feature_output_tensor, cp.channels_visualisation
+            )
             end = time.time()
-            self.log(f"3. Feature images generated in {round(end - start, 2)} seconds.")
+            self.log(f"3. Feature images for all tiles generated in {round(end - start, 2)} seconds.")
             self.set_progress(50)
         except Exception as e:
             self.log(f"Error in feature image generation: {e}")
             raise
 
     def generate_rgb_images(self):
-        """Generate RGB images"""
-        self.log("4. Generating RGB images...")
+        """Generate RGB images for all tensors"""
+        self.log("4. Generating RGB images for all tiles...")
         try:
+            if not self.project_dir:
+                raise Exception("Project directory not created. Please upload files first.")
             start = time.time()
-            tensors_input = os.path.join(self.project_dir, "tensors")
-            rgb_output = os.path.join(self.project_dir, "img_rgb")
-            rgb_join_output = os.path.join(self.project_dir, "img_rgb_join")
-            
-            main_not_parallel_tensor_to_image(tensors_input, rgb_output,
-                                              cp.feature_output_tensor, cp.channels_visualisation_rgb)
-            main_join_img(rgb_output, rgb_join_output)
+            tensors_dir = self.normpath(self.project_dir, "tensors")
+            rgb_output_dir = self.normpath(self.project_dir, "img_rgb")
+            os.makedirs(rgb_output_dir, exist_ok=True)
+            main_not_parallel_tensor_to_image(
+                tensors_dir, rgb_output_dir,
+                cp.feature_output_tensor, cp.channels_visualisation_rgb
+            )
             end = time.time()
-            self.log(f"4. RGB images generated in {round(end - start, 2)} seconds.")
+            self.log(f"4. RGB images for all tiles generated in {round(end - start, 2)} seconds.")
             self.set_progress(65)
         except Exception as e:
             self.log(f"Error in RGB image generation: {e}")
             raise
 
     def predict(self):
-        """Run prediction"""
-        self.log("5. Starting prediction...")
+        """Run prediction for all feature images"""
+        self.log("5. Starting prediction for all tiles...")
         try:
-            features_input = os.path.join(self.project_dir, "img_features")
-            predict_output = os.path.join(self.project_dir, "img_predict_multi_class")
-            predict_join_output = os.path.join(self.project_dir, "img_predict_multi_class_join")
-            
-            main_prediction(features_input, predict_output, cpred.checkpoint_path)
-            main_join_img(predict_output, predict_join_output)
-            self.log("5. Prediction completed!")
+            if not self.project_dir:
+                raise Exception("Project directory not created. Please upload files first.")
+            features_dir = self.normpath(self.project_dir, "img_features")
+            feature_imgs = [f for f in os.listdir(features_dir) if f.endswith('.png')]
+            predict_output_dir = self.normpath(self.project_dir, "img_predict_multi_class")
+            os.makedirs(predict_output_dir, exist_ok=True)
+            for feature_img in feature_imgs:
+                feature_img_path = self.normpath(features_dir, feature_img)
+                predict_img_output = self.normpath(predict_output_dir, feature_img)
+                main_prediction(feature_img_path, predict_img_output, cpred.checkpoint_path)
+                self.log(f"5. Prediction completed for {feature_img}!")
+            self.log("5. Prediction for all tiles completed!")
             self.set_progress(85)
         except Exception as e:
             self.log(f"Error in prediction: {e}")
             raise
 
     def generate_color_las(self):
-        """Generate colored LAS file"""
-        self.log("6. Generating colored LAS...")
+        """Generate colored LAS and LAS with classes for all files"""
+        self.log("6. Generating colored LAS and LAS with classes for all files...")
         try:
-            las_input_dir = os.path.join(self.project_dir, "las")
-            predict_join_dir = os.path.join(self.project_dir, "img_predict_multi_class_join")
-            las_colored_dir = os.path.join(self.project_dir, "las_colored")
+            for las_file, basename in zip(self.las_files, self.las_basenames):
+                las_input_dir = self.normpath(self.project_dir, "las")
+                predict_join_dir = self.normpath(self.project_dir, "img_predict_multi_class_join")
+                las_colored_dir = self.normpath(self.project_dir, "las_colored")
+                las_with_class_dir = self.normpath(self.project_dir, "las_with_class")
+                
+                file_las = las_file  # las_file уже содержит полный путь к файлу в проекте
+                file_img_colored = self.normpath(predict_join_dir, f"{basename}_join.png")
+                
+                # Generate colored LAS with RGB values
+                file_las_colored = self.normpath(las_colored_dir, f"{basename}_colored.las")
+                mask_to_las_with_class_nn_rgb(
+                    las_file_path=file_las,
+                    image_file_path=file_img_colored,
+                    output_las_path=file_las_colored,
+                    class_colors=ccl.class_colors
+                )
+                self.log(f"6a. Colored LAS generated for {basename}!")
+                
+                # Generate LAS with classes only (preserving original RGB)
+                file_las_with_class = self.normpath(las_with_class_dir, f"{basename}_with_class.las")
+                mask_to_las_with_class_only(
+                    las_file_path=file_las,
+                    image_file_path=file_img_colored,
+                    output_las_path=file_las_with_class,
+                    class_colors=ccl.class_colors
+                )
+                self.log(f"6b. LAS with classes generated for {basename}!")
             
-            filenames_las = [f for f in os.listdir(las_input_dir) if f.endswith('.las')]
-            if not filenames_las:
-                raise Exception("No LAS files found in input directory")
-            
-            file_las = os.path.join(las_input_dir, filenames_las[0])
-            filenames_img_colored = [f for f in os.listdir(predict_join_dir) if f.endswith('.png')]
-            
-            if not filenames_img_colored:
-                raise Exception("No prediction images found")
-            
-            file_img_colored = os.path.join(predict_join_dir, filenames_img_colored[0])
-            file_las_colored = os.path.join(las_colored_dir, filenames_las[0])
-            
-            mask_to_las_with_class_nn_rgb(
-                las_file_path=file_las,
-                image_file_path=file_img_colored,
-                output_las_path=file_las_colored,
-                class_colors=ccl.class_colors
-            )
-            self.log("6. Colored LAS generated!")
-            self.log(f"Final result saved to: {file_las_colored}")
+            self.set_progress(95)
+        except Exception as e:
+            self.log(f"Error in LAS generation: {e}")
+            raise
+
+    def generate_overall_join_and_las(self):
+        """Generate overall join images and LAS files from all source files"""
+        self.log("7. Generating overall join images and LAS files...")
+        try:
+            # Create overall join directories
+            overall_dirs = [
+                self.normpath(self.project_dir, "img_features_join_all"),
+                self.normpath(self.project_dir, "img_rgb_join_all"),
+                self.normpath(self.project_dir, "img_predict_multi_class_join_all")
+            ]
+            for dir_path in overall_dirs:
+                os.makedirs(dir_path, exist_ok=True)
+            # Собираем все реальные файлы из папок
+            all_tensors_files = [self.normpath(self.project_dir, "tensors", f) for f in os.listdir(self.normpath(self.project_dir, "tensors")) if f.endswith('.npy')]
+            all_features_files = [self.normpath(self.project_dir, "img_features", f) for f in os.listdir(self.normpath(self.project_dir, "img_features")) if f.endswith('.png')]
+            all_rgb_files = [self.normpath(self.project_dir, "img_rgb", f) for f in os.listdir(self.normpath(self.project_dir, "img_rgb")) if f.endswith('.png')]
+            all_predict_files = [self.normpath(self.project_dir, "img_predict_multi_class", f) for f in os.listdir(self.normpath(self.project_dir, "img_predict_multi_class")) if f.endswith('.png')]
+            # Generate overall feature images join
+            overall_features_output = self.normpath(self.project_dir, "img_features_join_all", "all_join.png")
+            main_not_parallel_tensor_to_image(all_tensors_files, overall_features_output,
+                                              cp.feature_output_tensor, cp.channels_visualisation)
+            main_join_img(all_features_files, overall_features_output)
+            self.log("7a. Overall feature images join generated!")
+            # Generate overall RGB images join
+            overall_rgb_output = self.normpath(self.project_dir, "img_rgb_join_all", "all_join.png")
+            main_not_parallel_tensor_to_image(all_tensors_files, overall_rgb_output,
+                                              cp.feature_output_tensor, cp.channels_visualisation_rgb)
+            main_join_img(all_rgb_files, overall_rgb_output)
+            self.log("7b. Overall RGB images join generated!")
+            # Generate overall prediction join
+            overall_predict_output = self.normpath(self.project_dir, "img_predict_multi_class_join_all", "all_join.png")
+            main_join_img(all_predict_files, overall_predict_output)
+            self.log("7c. Overall prediction join generated!")
+            # Generate overall LAS files (combine all source LAS files)
+            las_colored_dir = self.normpath(self.project_dir, "las_colored")
+            las_with_class_dir = self.normpath(self.project_dir, "las_with_class")
+            # For overall LAS, we'll use the first LAS file as base and the overall prediction
+            if self.las_files:
+                first_las_file = self.las_files[0]
+                file_las = first_las_file  # first_las_file уже содержит полный путь к файлу в проекте
+                file_img_colored = overall_predict_output
+                # Generate overall colored LAS
+                file_las_colored = self.normpath(las_colored_dir, "all_colored.las")
+                mask_to_las_with_class_nn_rgb(
+                    las_file_path=file_las,
+                    image_file_path=file_img_colored,
+                    output_las_path=file_las_colored,
+                    class_colors=ccl.class_colors
+                )
+                self.log("7d. Overall colored LAS generated!")
+                # Generate overall LAS with classes
+                file_las_with_class = self.normpath(las_with_class_dir, "all_with_class.las")
+                mask_to_las_with_class_only(
+                    las_file_path=file_las,
+                    image_file_path=file_img_colored,
+                    output_las_path=file_las_with_class,
+                    class_colors=ccl.class_colors
+                )
+                self.log("7e. Overall LAS with classes generated!")
+            self.log("7. Overall join and LAS generation completed!")
             self.set_progress(100)
         except Exception as e:
-            self.log(f"Error in colored LAS generation: {e}")
+            self.log(f"Error in overall join and LAS generation: {e}")
             raise
 
     def run_pipeline_thread(self):
@@ -352,6 +449,7 @@ class MainApp:
             self.generate_rgb_images()
             self.predict()
             self.generate_color_las()
+            self.generate_overall_join_and_las() # Added this line
             self.log("✅ Pipeline finished successfully!")
             self.status_var.set("Pipeline completed successfully")
         except Exception as e:

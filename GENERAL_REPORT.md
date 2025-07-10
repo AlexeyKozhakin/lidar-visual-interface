@@ -250,6 +250,12 @@ The system includes two specialized machine learning models:
 ![3D Classification](report_images/3d/3d_classification_visualization.png)
 *Figure 3.9: 3D visualization of classified point cloud data*
 
+![Sliema Classification](report_images/3d/sliema_classification.png)
+*Figure 3.10: Detailed 3D classification results for Sliema area showing multi-class point cloud segmentation*
+
+![Sliema Original Data](report_images/3d/sliema_original_data.png)
+*Figure 3.11: Original 3D point cloud data for Sliema area before classification processing*
+
 ### 3.3 Parallel Processing
 
 #### 3.3.1 Implementation Strategy
