@@ -3,30 +3,35 @@ import os
 from multiprocessing import Pool
 
 
-def split_las(input_path, output_dir, tile_size=250):
+def split_las(input_path, output_dir, tile_size=250, train_mode=False):
     os.makedirs(output_dir, exist_ok=True)
-    # Читаем исходный las файл
+    # Read the source LAS file
     las = laspy.read(input_path)
 
-    # Берем имя файла без расширения
+    # Get the file name without extension
     base_name = os.path.splitext(os.path.basename(input_path))[0]
-    
-    # Парсим начальные координаты X и Y из имени файла
-    x0_km, y0_km = map(int, base_name.split("_"))
+
+    # Parse initial X and Y coordinates from the file name
+    if not train_mode:
+        x0_km, y0_km = map(int, base_name.split("_")) # Style for prediction Malta
+    else:
+        x0_km, y0_km = 0, 0
+        # Style for training
+        
     x0 = x0_km * 1000
     y0 = y0_km * 1000
 
-    # Получаем диапазоны
+    # Get ranges
     x_min = x0
     x_max = x0 + 1000
     y_min = y0
     y_max = y0 + 1000
 
-    # Получаем координаты всех точек
+    # Get coordinates of all points
     xs = las.x
     ys = las.y
 
-    # Перебираем все 250м квадраты
+    # Iterate over all 250m squares
     for i in range(0, 1000, tile_size):
         for j in range(0, 1000, tile_size):
             tile_x_min = x_min + i
@@ -34,25 +39,25 @@ def split_las(input_path, output_dir, tile_size=250):
             tile_y_min = y_min + j
             tile_y_max = tile_y_min + tile_size
 
-            # Фильтруем точки, попадающие в этот тайл
+            # Filter points that fall into this tile
             mask = (xs >= tile_x_min) & (xs < tile_x_max) & (ys >= tile_y_min) & (ys < tile_y_max)
             selected_points = las.points[mask]
 
             if len(selected_points) > 0:
-                # Создаем новый las объект
+                # Create a new LAS object
                 new_las = laspy.LasData(las.header)
                 new_las.points = selected_points
+                if not train_mode:
+                    output_name = f"{x0_km}_{y0_km}_{tile_x_min}_{tile_y_min}.las"                    
+                else:
+                    output_name = f"{base_name}_{x0_km}_{y0_km}_{tile_x_min}_{tile_y_min}.las"
 
-                # Формируем имя нового файла
-                output_name = f"{x0_km}_{y0_km}_{tile_x_min}_{tile_y_min}.las"
                 output_path = os.path.join(output_dir, output_name)
-
-                # Сохраняем
+                # Save
                 new_las.write(output_path)
-
                 print(f"Saved {output_path}")
 
-def process_file_cut_tiles(filename, input_directory, output_directory, tile_size=250):
+def process_file_cut_tiles(filename, input_directory, output_directory, tile_size=250, train_mode=False):
     """
     Нарезает один LAS-файл на tiles с помощью lastile.
 
@@ -65,10 +70,10 @@ def process_file_cut_tiles(filename, input_directory, output_directory, tile_siz
     #name, _ = os.path.splitext(filename)
     #output_subdir = os.path.join(output_directory, name)
     # Создаем подкаталог для текущего файла, если он не существует
-    split_las(input_file, output_directory, tile_size=tile_size)
+    split_las(input_file, output_directory, tile_size=tile_size, train_mode=train_mode)
 
 
-def main_parallel_cut_tiles(input_directory, output_directory, tile_size=250):
+def main_parallel_cut_tiles(input_directory, output_directory, tile_size=250, train_mode=False):
     """
     Параллельная нарезка всех LAS-файлов в директории.
 
@@ -89,10 +94,10 @@ def main_parallel_cut_tiles(input_directory, output_directory, tile_size=250):
     print('num_processes',num_processes)
     print('cpu = ',os.cpu_count())
     with Pool(processes=num_processes) as pool:
-        pool.starmap(process_file_cut_tiles, [(filename, input_directory, output_directory, tile_size) for filename in filenames])
+        pool.starmap(process_file_cut_tiles, [(filename, input_directory, output_directory, tile_size, train_mode) for filename in filenames])
 
 
-def main_not_parallel_cut_tiles(input_directory, output_directory, tile_size=250):
+def main_not_parallel_cut_tiles(input_directory, output_directory, tile_size=250, train_mode=False):
     """
     Параллельная нарезка всех LAS-файлов в директории.
 
@@ -110,7 +115,7 @@ def main_not_parallel_cut_tiles(input_directory, output_directory, tile_size=250
 
 
     for filename in filenames:
-        process_file_cut_tiles(filename, input_directory, output_directory, tile_size=tile_size)
+        process_file_cut_tiles(filename, input_directory, output_directory, tile_size=tile_size, train_mode=train_mode)
 
 
 if __name__ == '__main__':

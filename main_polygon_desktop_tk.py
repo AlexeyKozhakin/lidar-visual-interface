@@ -5,7 +5,7 @@ import threading
 import tkinter as tk
 from tkinter import ttk, filedialog, scrolledtext, messagebox
 
-# Импорт функций пайплайна
+# Import pipeline functions
 from preprocessing.transformation_las2npy import main_not_parallel_transform_to_tensor
 from preprocessing.image_generator import main_not_parallel_tensor_to_image
 from preprocessing.slicing_las_python import main_not_parallel_cut_tiles
@@ -21,10 +21,10 @@ from postprocessing.join_img import main_join_img
 import ctypes
 
 try:
-    ctypes.windll.shcore.SetProcessDpiAwareness(1)  # Для Windows 8.1+
+    ctypes.windll.shcore.SetProcessDpiAwareness(1)  # For Windows 8.1+
 except:
     try:
-        ctypes.windll.user32.SetProcessDPIAware()  # Для Windows 7
+        ctypes.windll.user32.SetProcessDPIAware()  # For Windows 7
     except:
         pass
 
@@ -32,10 +32,10 @@ class LASApp(tk.Tk):
     def __init__(self):
         super().__init__()
         self.title("LAS File Processing - Tkinter Version")
-        self.state('zoomed')  # Для Windows
+        self.state('zoomed')  # For Windows
         self.resizable(False, False)
 
-        # 📁 Создаём уникальный каталог проекта по времени (до секунды)
+        # 📁 Create unique project directory by time (up to seconds)
         self.project_root = self.generate_project_path(os.getcwd())
         os.makedirs(self.project_root, exist_ok=True)
 
@@ -56,14 +56,14 @@ class LASApp(tk.Tk):
 
     def create_widgets(self):
 
-        button_width = 30  # Количество символов по ширине
+        button_width = 30  # Number of characters in width
 
 
 
         self.upload_btn = ttk.Button(self, text="Upload LAS Files", command=self.upload_files, width=button_width)
         self.upload_btn.pack(pady=(15, 5), anchor='center')
 
-        # Галочка для мультиклассовой сегментации
+        # Checkbox for multi-class segmentation
         self.multiclass_var = tk.BooleanVar()
         self.multiclass_checkbox = ttk.Checkbutton(self, text="Enable Multi-class Segmentation", variable=self.multiclass_var)
         self.multiclass_checkbox.pack(pady=(5, 5), anchor='center')
@@ -81,18 +81,18 @@ class LASApp(tk.Tk):
         self.log_box = scrolledtext.ScrolledText(self, wrap=tk.WORD, height=25)
         self.log_box.pack(padx=10, pady=10, fill=tk.BOTH, expand=True)
 
-        # Кнопки директорий под логом
+        # Directory buttons under the log
         dir_frame = ttk.LabelFrame(self, text="Open Output Directories")
         dir_frame.pack(pady=10, padx=10, fill=tk.X)
 
-        # Настройки сетки
+        # Grid settings
         for i in range(2):
             dir_frame.columnconfigure(i, weight=1)
 
-        # Устанавливаем нужную ширину для всех кнопок
+        # Set required width for all buttons
         button_width = 35
 
-        # Кнопки директорий (в 2 ряда по 3 столбца)
+        # Directory buttons (in 2 rows by 3 columns)
         dir_frame = ttk.Frame(self)
         dir_frame.pack(pady=10, anchor="center")
 
@@ -124,7 +124,7 @@ class LASApp(tk.Tk):
                 command=lambda: self.open_folder(os.path.join(self.project_root, cmulticlass.output_directory_join)),
                 width=button_width).grid(row=2, column=0, padx=5, pady=5, sticky="ew")
 
-        # Футер
+        # Footer
         footer = ttk.Label(self, text="MUSAC Project", anchor="center", font=("Arial", 10, "italic"))
         footer.pack(side=tk.BOTTOM, pady=5)
 
@@ -149,7 +149,7 @@ class LASApp(tk.Tk):
         for d in dirs:
             os.makedirs(os.path.join(self.project_root, d), exist_ok=True)
         
-        # Создаем каталоги для мультиклассовой сегментации
+        # Create directories for multi-class segmentation
         multiclass_dirs = [
             cmulticlass.output_directory,
             cmulticlass.output_directory_join
@@ -169,7 +169,7 @@ class LASApp(tk.Tk):
     def upload_files(self):
         files = filedialog.askopenfilenames(filetypes=[("LAS files", "*.las")])
         if files:
-            # Автоматически создаем новый каталог проекта при загрузке файлов
+            # Automatically create new project directory when uploading files
             new_project_path = self.generate_project_path(os.getcwd())
             try:
                 os.makedirs(new_project_path)
@@ -177,7 +177,7 @@ class LASApp(tk.Tk):
                 self.log(f"📂 Automatically created new project folder: {new_project_path}")
                 self.setup_directories()
                 
-                # Копируем файлы в новый каталог проекта
+                # Copy files to new project directory
                 for file_path in files:
                     dest_path = os.path.join(self.project_root, cp.path_las_before_cut, os.path.basename(file_path))
                     os.makedirs(os.path.join(self.project_root, cp.path_las_before_cut), exist_ok=True)
@@ -257,7 +257,7 @@ class LASApp(tk.Tk):
                              )
             self.log("5. Building prediction completed!")
             
-            # Мультиклассовая сегментация (если включена)
+            # Multi-class segmentation (if enabled)
             if self.multiclass_var.get():
                 self.log("5a. Starting multi-class prediction...")
                 main_multiclass_prediction(

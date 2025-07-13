@@ -125,7 +125,7 @@ Polygon Generation → Shapefile Export
 #### 3.1.1 Input Processing
 - **File Format**: LAS 1.0-1.4 point cloud data
 - **Point Attributes**: X, Y, Z coordinates, RGB values, classification codes
-- **File Size**: Handles files up to <span style="background-color: yellow;">several GB</span>
+- **File Size**:  Recommended up to 300 MB (optimal performance at ~160 MB ≈ 5 million points), ensuring the best speed and quality of processing
 - **Tiling Strategy**: 250m x 250m tiles for optimal processing
 
 #### 3.1.2 Feature Extraction
@@ -139,6 +139,8 @@ The system extracts sophisticated features from point cloud data:
    - n_z: Vertical component of surface normal
    - n_r: Radial component of surface normal
 
+Visualization of the elevation and surface normal features using images is shown in Figures 3.3a and 3.3b.
+
 3. **Color Features**:
    - RGB values: Color information from LiDAR data
    - Normalized color channels
@@ -148,7 +150,7 @@ The system extracts sophisticated features from point cloud data:
    - Mode-based classification
 
 5. **Distance Features**:
-   - dist_mean: Mean distance from <span style="background-color: yellow;">K neighbors</span> to central point
+   - dist_mean: The mean distance feature (dist_mean) is not utilized in the current version of the system; it was developed for additional testing of the transformation process.
 
 #### 3.1.3 Processing Parameters
 - **Tile Size**: 250m x 250m (configurable)
@@ -239,16 +241,6 @@ The system includes two specialized machine learning models:
 ![Multi-class Segmentation - Gozo Rabat](report_images/predictions/multiclass_segmentation_results_gozo_rabat.png)
 *Figure 3.6c: Multi-class segmentation results for Gozo Rabat area showing detailed object segmentation*
 
-#### Post-processing Results
-![Stitched Images](report_images/postprocessing/stitched_prediction.png)
-*Figure 3.7: Stitched prediction results combining multiple tiles*
-
-#### 3D Classification Results
-![3D Colored Points](report_images/3d/colored_3d_points.png)
-*Figure 3.8: 3D point cloud with classification colors applied*
-
-![3D Classification](report_images/3d/3d_classification_visualization.png)
-*Figure 3.9: 3D visualization of classified point cloud data*
 
 ![Sliema Classification](report_images/3d/sliema_classification.png)
 *Figure 3.10: Detailed 3D classification results for Sliema area showing multi-class point cloud segmentation*
@@ -269,6 +261,28 @@ The system includes two specialized machine learning models:
 - **Memory Mapping**: Efficient large file handling
 - **Vectorization**: NumPy-based operations
 - **Caching**: Intermediate result storage
+
+### 3.4 Data Preparation and Neural Network Training: Jupyter Notebooks
+
+To ensure experiment reproducibility and transparency in data preparation and neural network training, the project includes dedicated Jupyter notebooks:
+
+- [`visual_lidar_code_training_model.ipynb`](training/notebook/visual_lidar_code_training_model.ipynb) — a complete workflow for data preparation, training, and validation of the LiDAR segmentation neural network model.
+- [`stretch_las_to_rectangle.ipynb`](training/notebook/stretch_las_to_rectangle.ipynb) — processing and stretching of LAS files that do not have a regular rectangular shape, making them suitable for the ML pipeline.
+
+#### Visualization of Stretching Irregular LAS Areas
+
+The figure below demonstrates the transformation of source data with an irregular shape into a rectangular area suitable for further processing and training:
+
+## Before and After Stretching
+
+| Before & After |
+|:-----------------------:|
+| ![](report_images/training/stretch_data_1.png) |
+| ![](report_images/training/stretch_data_2.png) |
+| ![](report_images/training/stretch_data_3.png) |
+
+
+*Figure 3.12: Examples of transforming irregular LAS areas into a rectangular shape for ML processing.*
 
 ## 4. User Interface
 
@@ -295,11 +309,9 @@ The system includes two specialized machine learning models:
 ![3D Segmentation App](report_images/ui/3d_segmentation_app.png)
 *Figure 4.2: Main interface of the 3D Multi-Class Segmentation Application*
 
-![Processing Progress](report_images/ui/processing_progress.png)
-*Figure 4.3: Real-time processing progress with detailed logging*
 
 ![Result Preview](report_images/ui/result_preview.png)
-*Figure 4.4: Result preview with image browsing and file management*
+*Figure 4.3: Result preview with image browsing and file management*
 
 ### 4.2 Command Line Interface
 
@@ -382,7 +394,7 @@ OUTPUT_SUFFIX = "_with_class"  # Output file suffix
 ### 6.1 Input Formats
 - **LAS Files**: LiDAR point cloud data (LAS 1.0-1.4)
 - **Point Attributes**: X, Y, Z coordinates, RGB values, classification
-- **File Size**: Handles files up to <span style="background-color: yellow;">several GB</span>
+- **File Size**: Recommended up to 300 MB (optimal performance at ~160 MB ≈ 5 million points), ensuring the best speed and quality of processing
 - **Coordinate Systems**: Supports various coordinate reference systems
 
 ### 6.2 Output Formats
