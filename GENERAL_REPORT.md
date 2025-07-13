@@ -281,8 +281,29 @@ The figure below demonstrates the transformation of source data with an irregula
 | ![](report_images/training/stretch_data_2.png) |
 | ![](report_images/training/stretch_data_3.png) |
 
-
 *Figure 3.12: Examples of transforming irregular LAS areas into a rectangular shape for ML processing.*
+
+### 3.5 LAS File Cleaning and Point Cloud Reduction Application
+
+A dedicated application was developed to preprocess raw LAS files by significantly reducing the number of points and removing noise. Raw LiDAR files often contain hundreds of millions of points, which can be computationally expensive and include a large amount of noise. This tool allows users to:
+
+- **Reduce the number of points**: Downsample large point clouds to a manageable size (e.g., from hundreds of millions to 1–5 million points) while preserving the essential structure.
+- **Remove noise**: Apply both global and local noise filtering to clean the data, eliminating outliers and irrelevant points.
+
+**The cleaning algorithm is based on statistical criteria:**  
+- **Global filtering** removes points that deviate significantly from the overall distribution (e.g., using a Z-score or sigma threshold).
+- **Local filtering** analyzes the distribution of points within local neighborhoods or grid cells, removing local outliers based on statistical thresholds.
+
+This cleaning process is crucial for efficient downstream processing and high-quality machine learning results.
+
+#### Application Interface
+
+Below are example screenshots of the LAS cleaning and reduction application:
+
+<!-- Place your screenshots here -->
+![LAS Cleaning App - Main Window](report_images/las_filter_app/las-filter-interface.png)
+*Figure 3.13: Main interface of the LAS cleaning and reduction application.*
+
 
 ## 4. User Interface
 
@@ -395,7 +416,9 @@ OUTPUT_SUFFIX = "_with_class"  # Output file suffix
 - **LAS Files**: LiDAR point cloud data (LAS 1.0-1.4)
 - **Point Attributes**: X, Y, Z coordinates, RGB values, classification
 - **File Size**: Recommended up to 300 MB (optimal performance at ~160 MB ≈ 5 million points), ensuring the best speed and quality of processing
-- **Coordinate Systems**: Supports various coordinate reference systems
+- **Open Dataset**:  
+  Public LiDAR datasets used for testing and demonstration:  
+  - [STPLS3D - Urban LiDAR Datasets](https://www.stpls3d.com/data)
 
 ### 6.2 Output Formats
 - **Tensors**: NumPy arrays (.npy) with extracted features
@@ -405,178 +428,85 @@ OUTPUT_SUFFIX = "_with_class"  # Output file suffix
 - **Classified LAS Files**: 3D point clouds with classification codes
 - **Logs**: Processing logs and error reports
 
-### 6.3 Data Quality
-- **Validation**: Input format verification
-- **Error Handling**: Graceful failure recovery
-- **Data Integrity**: Checksums and validation
-- **Backup**: Automatic backup of intermediate results
 
 ## 7. Performance Analysis
 
-### 7.1 Computational Complexity
-- **Time Complexity**: O(n log n) for KNN search
-- **Space Complexity**: O(n) for point storage
-- **Memory Usage**: ~2GB for 512x512 tensor processing
-- **Processing Speed**: Varies with dataset size and hardware
+### 7.1 Computational Strategy
 
-### 7.2 Scalability
-- **Horizontal Scaling**: Parallel processing across CPU cores
-- **Vertical Scaling**: GPU acceleration for ML inference
-- **Data Size**: Handles datasets up to several TB
-- **Network**: Distributed processing capabilities
+- **Vectorized Feature Computation**: Feature generation during preprocessing is fully vectorized using **NumPy**, significantly accelerating tensor operations and reducing computation time.
+- **GPU-Accelerated Training**: Model training is performed on **GPU**, enabling faster convergence and efficient handling of large datasets.
+- **Efficient Nearest Neighbor Search**: The **KDTree** algorithm is used for nearest neighbor search, providing fast query times during feature matching and neighborhood-based processing.
 
-### 7.3 Optimization Strategies
-1. **Memory Mapping**: Efficient large file handling
-2. **Batch Processing**: Reduced I/O overhead
-3. **Vectorization**: NumPy-based operations
-4. **Caching**: Intermediate result storage
-5. **Compression**: Data compression for storage efficiency
+## 8. System Requirements and Deployment
 
-## 8. Error Handling and Robustness
-
-### 8.1 Error Categories
-1. **File I/O Errors**: Missing files, permission issues
-2. **Data Format Errors**: Invalid LAS files, corrupted data
-3. **Memory Errors**: Insufficient RAM for large datasets
-4. **Processing Errors**: Algorithm failures, numerical issues
-5. **Network Errors**: Distributed processing failures
-
-### 8.2 Recovery Mechanisms
-- **Graceful Degradation**: Continue processing with available data
-- **Error Logging**: Comprehensive error tracking
-- **Retry Logic**: Automatic retry for transient failures
-- **Data Validation**: Input format verification
-- **Checkpoint Recovery**: Resume from last successful state
-
-### 8.3 Quality Assurance
-- **Input Validation**: Format and content verification
-- **Output Validation**: Result quality assessment
-- **Performance Monitoring**: Real-time performance tracking
-- **Error Reporting**: Detailed error analysis and reporting
-
-## 9. System Requirements and Deployment
-
-### 9.1 Hardware Requirements
+### 8.1 Hardware Requirements
 - **CPU**: Multi-core processor (4+ cores recommended)
-- **Memory**: 8GB+ RAM (16GB+ for large datasets)
+- **Memory**: 16GB+
 - **Storage**: SSD recommended for large datasets
-- **GPU**: Optional for ML acceleration (NVIDIA GPU recommended)
+- **GPU:** An NVIDIA GPU is required for efficient AI model training.
 
-### 9.2 Software Requirements
+### 8.2 Software Requirements
 - **Operating System**: Windows, Linux, macOS
 - **Python Version**: 3.8+
 - **Dependencies**: See requirements.txt for complete list
-- **Additional Tools**: lastile, GDAL (optional)
 
-### 9.3 Deployment Options
-1. **Local Installation**: Direct Python installation
-2. **Docker Container**: Containerized deployment
-3. **Cloud Deployment**: AWS, Azure, GCP support
-4. **Cluster Computing**: Distributed processing support
+### 8.3 Deployment Options
+- **Local Installation**: Direct Python installation
 
-## 10. Testing and Validation
 
-### 10.1 Testing Strategy
-- **Unit Tests**: Individual module testing
-- **Integration Tests**: Pipeline end-to-end testing
-- **Performance Tests**: Load and stress testing
-- **User Acceptance Tests**: Interface usability testing
+## 9. Documentation and Support
 
-### 10.2 Validation Methods
-- **Data Validation**: Input format verification
-- **Result Validation**: Output quality assessment
-- **Performance Validation**: Speed and accuracy metrics
-- **User Validation**: Interface usability assessment
-
-### 10.3 Quality Metrics
-- **Code Coverage**: Comprehensive test coverage
-- **Performance Benchmarks**: Speed and memory usage
-- **Accuracy Metrics**: ML model performance
-- **User Satisfaction**: Interface usability scores
-
-## 11. Documentation and Support
-
-### 11.1 Documentation Structure
+### 9.1 Documentation Structure
 - **README.md**: Project overview and quick start
-- **TECHNICAL_REPORT.md**: Detailed technical documentation
 - **GENERAL_REPORT.md**: This comprehensive report
 - **requirements.txt**: Dependency management
-- **Code Comments**: Inline documentation
 
-### 11.2 User Support
-- **Installation Guide**: Step-by-step setup instructions
-- **User Manual**: Detailed usage instructions
-- **Troubleshooting**: Common issues and solutions
-- **FAQ**: Frequently asked questions
+- **Jupyter Notebook for LAS Cleaning**:  
+  [`las_filtering_and_reduction.ipynb`](training/notebook/las_filtering_and_reduction.ipynb) — step-by-step workflow for point cloud cleaning and reduction.
 
-### 11.3 Developer Documentation
-- **API Documentation**: Function and class documentation
-- **Architecture Guide**: System design documentation
-- **Contributing Guide**: Development guidelines
-- **Code Standards**: Coding conventions and standards
+- **Video Tutorial using APP**:  
+  [How to use the LAS cleaning application (YouTube)](https://youtu.be/YOUR_VIDEO_LINK_HERE)
 
-## 12. Future Enhancements
+- **Model Training Video Tutorial**:  
+  - Jupyter notebook: [`visual_lidar_code_training_model.ipynb`](training/notebook/visual_lidar_code_training_model.ipynb)
 
-### 12.1 Planned Improvements
-1. **3D Visualization**: Interactive 3D point cloud viewing
-2. **Advanced ML Models**: Transformer-based architectures
-3. **Real-time Processing**: Streaming data processing
-4. **Cloud Integration**: Direct cloud storage support
-5. **API Development**: RESTful API for integration
+- **Model Training Notebook**:  
+  - Jupyter notebook: [`visual_lidar_code_training_model.ipynb`](training/notebook/visual_lidar_code_training_model.ipynb)
 
-### 12.2 Research Directions
-1. **Multi-class Segmentation**: Extended object classification
-2. **Temporal Analysis**: Change detection over time
-3. **Deep Learning Optimization**: Model compression and acceleration
-4. **Geospatial Analytics**: Advanced spatial analysis tools
 
-### 12.3 Technology Roadmap
-- **Short-term** (3-6 months): Performance optimization and bug fixes
-- **Medium-term** (6-12 months): New features and ML model improvements
-- **Long-term** (1-2 years): Advanced analytics and cloud integration
+## 10. Impact and Applications
 
-## 13. Impact and Applications
-
-### 13.1 Use Cases
+### 10.1 Use Cases
 1. **Urban Planning**: Building footprint extraction and analysis
 2. **Environmental Monitoring**: Vegetation and terrain analysis
 3. **Infrastructure Management**: Road and utility mapping
 4. **Disaster Assessment**: Damage evaluation and recovery planning
 5. **Archaeological Survey**: Site mapping and feature detection
 
-### 13.2 Industry Applications
+### 10.2 Industry Applications
 - **Government**: Municipal planning and infrastructure management
 - **Engineering**: Civil engineering and construction planning
 - **Environmental**: Conservation and environmental assessment
-- **Insurance**: Risk assessment and damage evaluation
 - **Research**: Academic and scientific research
 
-### 13.3 Economic Impact
+### 10.3 Economic Impact
 - **Cost Reduction**: Automated processing reduces manual labor costs
 - **Time Savings**: Faster processing enables quicker decision-making
 - **Accuracy Improvement**: ML-based analysis reduces human error
 - **Scalability**: Handles large datasets efficiently
 
-## 14. Conclusion
 
-### 14.1 Project Success
+## 11. Conclusion
+
+### 11.1 Project Success
 The LiDAR Visual Interface system successfully addresses the identified problems and provides a comprehensive solution for LiDAR data processing. Key achievements include:
 
 - **Complete Pipeline**: End-to-end processing from raw data to GIS outputs
 - **Advanced ML Integration**: Sophisticated building segmentation capabilities
 - **User-Friendly Interface**: Accessible to both technical and non-technical users
-- **Scalable Architecture**: Handles datasets of varying sizes efficiently
 - **Professional Quality**: Production-ready code with comprehensive documentation
 
-### 14.2 Technical Excellence
-The system demonstrates technical excellence in several areas:
-
-- **Modern Architecture**: Modular, maintainable, and extensible design
-- **Performance Optimization**: Efficient algorithms and parallel processing
-- **Robust Error Handling**: Comprehensive error management and recovery
-- **Quality Assurance**: Thorough testing and validation procedures
-
-### 14.3 Future Potential
+### 11.2 Future Potential
 The system provides a solid foundation for future development and has significant potential for:
 
 - **Commercialization**: Market-ready product for various industries
@@ -584,30 +514,19 @@ The system provides a solid foundation for future development and has significan
 - **Technology Transfer**: Knowledge transfer to other domains
 - **Open Source Contribution**: Potential for community development
 
-### 14.4 Recommendations
+### 11.3 Recommendations
 1. **Immediate**: Focus on performance optimization and user experience improvements
 2. **Short-term**: Implement additional ML models and visualization features
 3. **Long-term**: Develop cloud-based deployment and advanced analytics capabilities
 
-## 15. Appendices
 
-### 15.1 Technical Specifications
+## 12. Appendices
+
+### 12.1 Technical Specifications
 - **Programming Language**: Python 3.8+
 - **Framework**: PyTorch, Tkinter, NumPy, SciPy
 - **Architecture**: Modular pipeline-based design
-- **Deployment**: Local, containerized, and cloud-ready
 
-### 15.2 Performance Benchmarks
-- **Processing Speed**: Varies with dataset size and hardware
-- **Memory Usage**: Optimized for available system resources
-- **Accuracy**: High accuracy in building detection tasks
-- **Scalability**: Linear scaling with available CPU cores
-
-### 15.3 Code Quality Metrics
-- **Lines of Code**: ~2000+ lines of production code
-- **Test Coverage**: Comprehensive unit and integration tests
-- **Documentation**: Extensive inline and external documentation
-- **Code Standards**: PEP 8 compliance and best practices
 
 ---
 
