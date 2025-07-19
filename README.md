@@ -113,6 +113,8 @@ pip install -r requirements_3d_las_colored_app.txt
 
 You can download the following applications:
 
+- **[LasFilter](https://drive.google.com/file/d/1xY-dF9Nef1U0kk-r9ruKcYNgmSQRbeLe/view?usp=drive_link)**  
+  Application for noise cleaning in LAS files and reducing point density to create lighter files.
 
 - **[Segmentation and Polygon Generator](https://drive.google.com/file/d/1tyRdCsoVPXIdrV4xQklq-VKvql8K8_W_/view?usp=sharing)**  
   Application for building segmentation and generating polygons.
