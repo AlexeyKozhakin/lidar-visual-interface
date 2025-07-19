@@ -1,6 +1,5 @@
 import os
 import numpy as np
-import matplotlib.pyplot as plt
 from PIL import Image
 from multiprocessing import Pool
 
@@ -95,26 +94,27 @@ def main_not_parallel_tensor_to_image(input_dir, output_dir,
     for filename in filenames:
         visual_tensor(input_dir, filename, feature_output_tensor, channels_visualisation, output_dir)
 
-if __name__ == "__main__":
-    import config_preprocessing as cp
-    import time
+# if __name__ == "__main__":
+#     import matplotlib.pyplot as plt
+#     import config_preprocessing as cp
+#     import time
     
-    start = time.time()
-    # Example function call
-    input_dir = cp.path_tensor_to_visual
-    output_dir = cp.path_image
-    # Create output directory if it doesn't exist
-    os.makedirs(output_dir, exist_ok=True)
+#     start = time.time()
+#     # Example function call
+#     input_dir = cp.path_tensor_to_visual
+#     output_dir = cp.path_image
+#     # Create output directory if it doesn't exist
+#     os.makedirs(output_dir, exist_ok=True)
 
-    # Get list of .npy files
-    filenames = [f for f in os.listdir(input_dir) if f.endswith('.npy')]
-    print(filenames)
-    for filename in filenames:
-        file_path = os.path.join(input_dir, filename)
-        data = np.load(file_path)  # Loading
-        # Call function for visualization
-        visual_tensor(input_dir, filename,
-                      cp.feature_input_tensor, 
-                      cp.feature_output_tensor, cp.channels_visualisation, output_dir)
-    end = time.time()
-    print(round((end-start)))
+#     # Get list of .npy files
+#     filenames = [f for f in os.listdir(input_dir) if f.endswith('.npy')]
+#     print(filenames)
+#     for filename in filenames:
+#         file_path = os.path.join(input_dir, filename)
+#         data = np.load(file_path)  # Loading
+#         # Call function for visualization
+#         visual_tensor(input_dir, filename,
+#                       cp.feature_input_tensor, 
+#                       cp.feature_output_tensor, cp.channels_visualisation, output_dir)
+#     end = time.time()
+#     print(round((end-start)))

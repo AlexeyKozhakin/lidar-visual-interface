@@ -1,3 +1,5 @@
+
+venv*
 training/notebook/data/
 img_predict/
 log.txt

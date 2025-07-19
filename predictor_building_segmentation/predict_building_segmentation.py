@@ -25,9 +25,6 @@ class PredictionDataset(Dataset):
         return image, image_path.name
 
 
-import torch
-import segmentation_models_pytorch as smp
-
 def load_model(checkpoint_path, device="cpu"):
     # Path to encoder weights
     encoder_weights_path = "predictor_building_segmentation/model/resnet34-333f7ec4.pth"

@@ -19,8 +19,8 @@ def mask_to_las_with_class_only(las_file_path, image_file_path, output_las_path,
     # Step 1. Чтение исходного LAS файла
     las = laspy.read(las_file_path)
 
-    # Извлечение X, Y, Z координат
-    x, y, z = las.x, las.y, las.z
+    # Извлечение X, Y, Z координат и преобразование в numpy массивы
+    x, y, z = np.array(las.x), np.array(las.y), np.array(las.z)
 
     # Step 2. Чтение изображения с предсказаниями
     image = Image.open(image_file_path)
@@ -75,6 +75,11 @@ def mask_to_las_with_class_only(las_file_path, image_file_path, output_las_path,
 
     # Обновление только классификации
     new_las.classification = classifications
+    
+    # Масштабирование координат (деление на 10)
+    new_las.x = np.array(new_las.x) / 10 + x_min
+    new_las.y = np.array(new_las.y) / 10 + y_min
+    new_las.z = np.array(new_las.z) / 10
 
     # Step 9. Сохранение обновленного LAS файла
     new_las.write(output_las_path)
@@ -93,6 +98,9 @@ def create_output_directory():
 if __name__ == "__main__":
     # Импорт конфигурации
     from config_class_las import CLASS_COLORS, LAS_FILE_PATH, IMAGE_FILE_PATH, OUTPUT_DIRECTORY, OUTPUT_SUFFIX
+
+    LAS_FILE_PATH = r"C:\Users\alexe\VSCprojects\lidar-visual-interface\project_batch_15_07_2025_19_34_40\454_3973\las\454_3973\454_3973.las"
+    IMAGE_FILE_PATH = r"C:\Users\alexe\VSCprojects\lidar-visual-interface\project_batch_15_07_2025_19_34_40\454_3973\img_predict_multi_class_join\454_3973\joined.png"
 
     # Создание выходного каталога
     output_dir = create_output_directory()

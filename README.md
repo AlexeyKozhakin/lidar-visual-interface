@@ -62,36 +62,63 @@ lidar-visual-interface/
 
 1. Clone the repository:
 ```bash
-git clone <repository-url>
+git clone https://github.com/AlexeyKozhakin/lidar-visual-interface.git
 cd lidar-visual-interface
 ```
 
-2. Install dependencies:
+2. You need to create 3 environments if you need some development and want to run application and work with them from side of development
+- for app poligons
 ```bash
-pip install -r requirements.txt
+python -m venv venv_polygon_app
+```
+```bash
+.\venv_polygon_app\Scripts\activate
+```
+```bash
+pip install -r requirements_polygon_app.txt
 ```
 
-3. Install additional system dependencies:
-   - **lastile**: For LAS file tiling (LASlib)
-   - **GDAL**: For geospatial data processing
+- for app 3d_las_colored
+
+2. Install dependencies:
+```bash
+python -m venv venv_3d_las_colored_app
+```
+```bash
+.\venv_3d_las_colored_app\Scripts\activate
+```
+```bash
+pip install -r requirements_3d_las_colored_app.txt
+```
+
+3. Install additional app:
+   - **LasTools**: For LAS processing
+   - **CloudCompare** - visualisation
+   - **Potree** - alternative for visualisation
+   - **SAGA GIS** - visualisation results for polygons
+
 
 ## Usage
 
 ### Application 1: Polygon Generation
 
-#### Web Interface
+#### Desktop Applications
 
-Run the polygon generation application with Streamlit:
+You can download the following applications:
 
-```bash
-streamlit run main_poligon.py
-```
+- **[LasTools](https://lastools.github.io/)**  
+  If you have `.laz` files, use LasTools to convert them to `.las` format.
 
-The interface provides:
-- LAS file upload
-- Data processing pipeline execution
-- Visualization of results
-- File management
+- **[las-filter app](https://drive.google.com/file/d/1xY-dF9Nef1U0kk-r9ruKcYNgmSQRbeLe/view?usp=drive_link)**  
+  Use this tool for cleaning and further processing of `.las` files.
+
+- **[Segmentation and Polygon Generator](https://drive.google.com/file/d/1tyRdCsoVPXIdrV4xQklq-VKvql8K8_W_/view?usp=sharing)**  
+  Application for building segmentation and generating polygons.
+
+- **[3D Dataset Classification App](https://drive.google.com/file/d/1oY6EJGXahKysqOX7wn4frd4vzzXkIZHh/view?usp=drive_link)**  
+  Application for 3D classification of datasets.
+
+- **[Download example LAS files from a free dataset STPLS3D](https://drive.google.com/drive/folders/16eT2g6jTkBbqpKfWcr9lT7S2xU6VNCag)**
 
 #### Command Line
 

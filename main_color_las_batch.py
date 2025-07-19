@@ -30,6 +30,7 @@ from predictor_multiclass_segmentation.predict_multiclass_segmentation import ma
 from polygon_generator.polygon_generator import main_polygon_generator
 from postprocessing.join_img import main_join_img
 from generate_colored_las_3D.generate_colored_las_3D import mask_to_las_with_class_nn_rgb
+from generate_colored_las_3D.generate_class_las_3D import mask_to_las_with_class_only
 import generate_colored_las_3D.config_colored_las as ccl
 
 class MainApp:
@@ -241,6 +242,16 @@ class MainApp:
                 output_las_path=output_las_colored,
                 class_colors=ccl.class_colors
             )
+            
+            output_las_with_class = os.path.join(dirs["las_colored"], f"{base_name}_with_class.las")
+            mask_to_las_with_class_only(
+                las_file_path=file_las,
+                image_file_path=file_img_colored,
+                output_las_path=output_las_with_class,
+                class_colors=ccl.class_colors
+            )      
+
+
             self.log(f"{base_name}: Colored LAS generated at {output_las_colored}.")
             self.update_status(f"Completed processing {base_name}")
         except Exception as e:

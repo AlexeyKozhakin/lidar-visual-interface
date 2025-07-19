@@ -119,10 +119,11 @@ if __name__ == "__main__":
         19: [0, 254, 0],
     }
 
+    #base_name = "454_3974"
     # Paths
-    las_file_path = "temp/las/446_3972.las"
-    image_file_path = "temp\img_features_join_multi_class\joined.png"
-    output_las_path = "temp/output_file.las"
+    las_file_path = r"project_batch_15_07_2025_19_34_40\454_3974\las\454_3974\454_3974.las"
+    image_file_path = r"project_batch_15_07_2025_19_34_40\454_3974\img_predict_multi_class_join\454_3974\joined.png" 
+    output_las_path = "generate_class_las_3D/454_3974_colored.las"
 
     # Function call
     mask_to_las_with_class_nn_rgb(
