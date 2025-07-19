@@ -91,12 +91,19 @@ python -m venv venv_3d_las_colored_app
 pip install -r requirements_3d_las_colored_app.txt
 ```
 
-3. Install additional app:
-   - **LasTools**: For LAS processing
-   - **CloudCompare** - visualisation
-   - **Potree** - alternative for visualisation
-   - **SAGA GIS** - visualisation results for polygons
+3. Install additional applications:
 
+- **[LasTools](https://lastools.github.io/)**  
+  If you have `.laz` files, use LasTools to convert them to `.las` format.
+
+- **[CloudCompare](https://www.danielgm.net/cc/)**  
+  Application for 3D point cloud visualization.
+
+- **[Potree](https://github.com/potree/potree)**  
+  Alternative tool for web-based 3D point cloud visualization.
+
+- **[SAGA GIS](https://saga-gis.sourceforge.io/en/index.html)**  
+  Application for visualizing polygon results and advanced geospatial analysis.
 
 ## Usage
 
@@ -106,11 +113,6 @@ pip install -r requirements_3d_las_colored_app.txt
 
 You can download the following applications:
 
-- **[LasTools](https://lastools.github.io/)**  
-  If you have `.laz` files, use LasTools to convert them to `.las` format.
-
-- **[las-filter app](https://drive.google.com/file/d/1xY-dF9Nef1U0kk-r9ruKcYNgmSQRbeLe/view?usp=drive_link)**  
-  Use this tool for cleaning and further processing of `.las` files.
 
 - **[Segmentation and Polygon Generator](https://drive.google.com/file/d/1tyRdCsoVPXIdrV4xQklq-VKvql8K8_W_/view?usp=sharing)**  
   Application for building segmentation and generating polygons.
@@ -119,6 +121,12 @@ You can download the following applications:
   Application for 3D classification of datasets.
 
 - **[Download example LAS files from a free dataset STPLS3D](https://drive.google.com/drive/folders/16eT2g6jTkBbqpKfWcr9lT7S2xU6VNCag)**
+
+### Video tutorials
+- **[Video demonstration](YOUR_VIDEO_LINK)** — This video shows how to:
+  - Convert LAS files to LAZ format using the LasTools app
+  - Clean and optimize LAS files
+
 
 #### Command Line
 
