@@ -327,7 +327,7 @@ def main_parallel_transform_to_tensor(input_directory, output_directory,
     #mem_for_tensor_needed = 2
     #available_memory = mem.available
     #how_many_possible_processors = max(1, int(np.floor(available_memory/ (1024 ** 3)/2)))
-    num_processes = min(os.cpu_count(), len(filenames))
+    num_processes = 1 #min(os.cpu_count(), len(filenames))
     print(num_processes)
     print(filenames)
     with Pool(processes=num_processes) as pool:

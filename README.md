@@ -124,10 +124,73 @@ You can download the following applications:
 
 - **[Download example LAS files from a free dataset STPLS3D](https://drive.google.com/drive/folders/16eT2g6jTkBbqpKfWcr9lT7S2xU6VNCag)**
 
+
+## Class Definitions and Color Mapping
+
+| Class ID | Class Name | Description | RGB Color | Hex Color |
+|----------|------------|-------------|-----------|-----------|
+| 0 | Ground | Including grass, paved road, dirt, etc. | `[0, 0, 0]` | `#000000` |
+| 1 | Building | Including commercial, residential, educational buildings | `[180, 180, 180]` | `#B4B4B4` |
+| 2 | LowVegetation | 0.5m < vegetation height < 2.0m | `[0, 255, 0]` | `#00FF00` |
+| 3 | MediumVegetation | 2.0m < vegetation height < 5.0m | `[255, 255, 0]` | `#FFFF00` |
+| 4 | HighVegetation | 5.0m < vegetation height | `[255, 0, 0]` | `#FF0000` |
+| 5 | Vehicle | Including sedans and hatchback cars | `[135, 206, 250]` | `#87CEFA` |
+| 6 | Truck | Including pickup trucks, cement trucks, flat-bed trailers, trailer trucks, etc. | `[135, 206, 251]` | `#87CEFB` |
+| 7 | Aircraft | Including helicopters and airplanes | `[135, 206, 252]` | `#87CEFC` |
+| 8 | MilitaryVehicle | Including tanks and Humvees | `[135, 206, 253]` | `#87CEFD` |
+| 9 | Bike | Bicycles | `[135, 206, 254]` | `#87CEFE` |
+| 10 | Motorcycle | Motorcycles | `[0, 0, 1]` | `#000001` |
+| 11 | LightPole | Including light poles and traffic lights | `[0, 0, 2]` | `#000002` |
+| 12 | StreetSign | Including road signs erected at the side of roads | `[0, 0, 3]` | `#000003` |
+| 13 | Clutter | Including city furniture, construction equipment, barricades, and other 3D shapes | `[190, 153, 153]` | `#BE9999` |
+| 14 | Fence | Including timber, brick, concrete, metal fences | `[190, 153, 154]` | `#BE999A` |
+| 15 | Road | Including asphalt and concrete roads | `[0, 0, 4]` | `#000004` |
+| 16 | Unassigned | Not defined in current classification | `[0, 0, 5]` | `#000005` |
+| 17 | Windows | Glass windows | `[180, 180, 181]` | `#B4B4B5` |
+| 18 | Dirt | Bare earth | `[0, 0, 6]` | `#000006` |
+| 19 | Grass | Including grass lawn, wild grass, etc. | `[0, 254, 0]` | `#00FE00` |
+
+### Color Legend
+
+- **Ground (0)**: Black - Base terrain including roads and soil
+- **Building (1)**: Light Gray - All types of buildings
+- **Low Vegetation (2)**: Bright Green - Short vegetation (0.5-2m)
+- **Medium Vegetation (3)**: Yellow - Medium height vegetation (2-5m)
+- **High Vegetation (4)**: Red - Tall vegetation (>5m)
+- **Vehicles (5-9)**: Light Blue variants - Different vehicle types
+- **Infrastructure (11-12)**: Dark Blue variants - Poles and signs
+- **Clutter (13)**: Light Brown - Miscellaneous objects
+- **Fence (14)**: Brown variant - Various fence types
+- **Road (15)**: Dark Blue - Road surfaces
+- **Windows (17)**: Light Gray variant - Glass surfaces
+- **Dirt (18)**: Dark Blue - Bare earth
+- **Grass (19)**: Green variant - Grass areas
+
 ### Video tutorials
-- **[Video demonstration](YOUR_VIDEO_LINK)** — This video shows how to:
+- **[Video demonstration](https://drive.google.com/file/d/1VoYphqrhmuAaDeUUslMY0tVvkt_gdLVN/view?usp=sharing)** — This video shows how to:
   - Convert LAS files to LAZ format using the LasTools app
   - Clean and optimize LAS files
+  - Use app LasFilter
+  - Polygon buiding generator app
+  - 3D Mulitclass segmentation
+
+- **[Video tutorial: Model Training](YOUR_VIDEO_LINK)** — This video demonstrates how to:
+  - Preprocess data for model training
+  - Configure model parameters
+  - Launch the training process
+  - Monitor training progress and results
+  - Save and export the trained model
+
+- **[Jupyter Notebook: Model Training](training/notebook/visual_lidar_code_training_model.ipynb)** — This notebook contains code and examples for:
+  - Data preprocessing
+  - Model configuration
+  - Training workflow
+  - Visualization of results
+
+- **[Jupyter Notebook: Stretch LAS to Rectangle](training/notebook/stretch_las_to_rectangle.ipynb)** — This notebook demonstrates how to:
+  - Transform and normalize LAS point cloud data
+  - Stretch and fit point clouds to a rectangular area
+  - Prepare data for further processing or model training
 
 
 #### Command Line
