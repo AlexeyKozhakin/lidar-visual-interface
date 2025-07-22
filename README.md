@@ -174,7 +174,7 @@ You can download the following applications:
   - Polygon buiding generator app
   - 3D Mulitclass segmentation
 
-- **[Video tutorial: Model Training](YOUR_VIDEO_LINK)** — This video demonstrates how to:
+- **[Video tutorial: Model Training](https://drive.google.com/file/d/1BFdtrAxS8K_JkaHx_xsvnYrY6lPw27uH/view?usp=sharing)** — This video demonstrates how to:
   - Preprocess data for model training
   - Configure model parameters
   - Launch the training process
@@ -193,54 +193,7 @@ You can download the following applications:
   - Prepare data for further processing or model training
 
 
-#### Command Line
 
-Individual modules can be run independently:
-
-```bash
-# LAS file tiling
-python preprocessing/slicing_las.py
-
-# Feature extraction
-python preprocessing/transformation_las2npy.py
-
-# Image generation
-python preprocessing/image_generator.py
-
-# Building prediction
-python predictor_building_segmentation/predict_building_segmentation.py
-
-# Polygon generation
-python polygon_generator/polygon_generator.py
-```
-
-### Application 2: 3D Multi-Class Segmentation
-
-#### PyQt Interface
-
-Run the 3D segmentation application with PyQt:
-
-```bash
-python main_color_las.py
-```
-
-The interface provides:
-- Single LAS file upload
-- Multi-class segmentation pipeline
-- 3D point cloud classification
-- Colored LAS file output
-
-#### Command Line
-
-Run the 3D segmentation pipeline:
-
-```bash
-# Multi-class prediction
-python predictor_multiclass_segmentation/predict_multiclass_segmentation.py
-
-# 3D point cloud classification
-python generate_colored_las_3D/generate_colored_las_3D.py
-```
 
 ## Processing Pipelines
 
@@ -340,12 +293,6 @@ python generate_colored_las_3D/generate_colored_las_3D.py
 - **Classified LAS**: Enhanced LAS files with classification labels and RGB colors
 - **Feature Images**: PNG files for visualization
 
-## Performance
-
-- **Parallel Processing**: Multi-threaded operations for large datasets
-- **Memory Optimization**: Efficient tensor operations
-- **Scalable**: Handles large LiDAR datasets
-
 ## Dependencies
 
 ### Core Dependencies
@@ -361,27 +308,6 @@ python generate_colored_las_3D/generate_colored_las_3D.py
 - `torchvision`: Computer vision models
 - `segmentation-models-pytorch`: Segmentation models
 
-### Geospatial
-- `pyshp`: Shapefile handling
-- `gdal`: Geospatial data processing
 
-### Web Interface
-- `streamlit`: Web application framework
 
-## Contributing
 
-1. Fork the repository
-2. Create a feature branch
-3. Make your changes
-4. Add tests if applicable
-5. Submit a pull request
-
-## License
-
-[Add your license information here]
-
-## Acknowledgments
-
-- LASlib for LAS file processing
-- Segmentation Models PyTorch for ML models
-- Streamlit for web interface framework
