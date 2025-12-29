@@ -18,8 +18,8 @@ dependencies = [
     "opencv-python>=4.8",
     "Pillow>=9.5",
     "pyshp>=2.3",
-    "torch>=2.0",
-    "torchvision>=0.15",
+    "torch==2.7.1",
+    "torchvision==0.22.1",
     "segmentation-models-pytorch>=0.3",
     "tqdm>=4.64"
 ]
@@ -35,6 +35,9 @@ include-package-data = true
     "models/*.pt",
     "models/**/*.pt",
     "models/**",
+    "predictor_multiclass_segmentation/model/*.pth",
+    "predictor_multiclass_segmentation/model/**/*.pth",
+    "predictor_multiclass_segmentation/model/**",
     "data/**",
     "*.yaml",
     "*.yml",
