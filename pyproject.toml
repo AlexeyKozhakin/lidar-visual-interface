@@ -25,5 +25,6 @@ dependencies = [
 ]
 [tool.setuptools.packages.find]
 where = ["musac_las_classifier"]
+include = ["musac_las_classifier*"]
 [project.urls]
 "Homepage" = "https://github.com/AlexeyKozhakin/lidar-visual-interface"
