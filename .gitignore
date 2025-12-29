@@ -1,10 +1,11 @@
+example_data
+/predictor_building_segmentation
 venv*
 training/notebook/data/
 training/notebook/checkpoints_multiclass_metrics
 img_predict/
 log.txt
 polygons_shp/
-predictor_multiclass_segmentation/
 project_*
 tensors/
 
