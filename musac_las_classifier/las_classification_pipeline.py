@@ -96,6 +96,7 @@ class LasPipelineConfig:
     # =====================
 
     checkpoint_path: Optional[str] = None
+    encoder_weights_path: Optional[str] = None
 
     # =====================
     # Output
@@ -194,6 +195,7 @@ class LasClassificationPipeline:
             str(self.img_features_dir),
             str(self.img_pred_dir),
             self.config.checkpoint_path,
+            self.config.encoder_weights_path
         )
 
     def postprocess(self):

@@ -35,6 +35,7 @@ config = LasPipelineConfig(
     feature_output_tensor=cp.feature_output_tensor,
     channels_visualisation=cp.channels_visualisation,
     checkpoint_path=cpred.checkpoint_path,
+    encoder_weights_path=cpred.encoder_weights_path,
     class_colors=ccl.class_colors,
 )
 

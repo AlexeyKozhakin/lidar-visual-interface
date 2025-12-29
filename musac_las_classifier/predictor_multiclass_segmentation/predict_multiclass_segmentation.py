@@ -56,9 +56,8 @@ class PredictionDataset(Dataset):
         return image, image_path.name
 
 # === Загрузка модели ===
-def load_model(checkpoint_path, num_classes, device="cpu"):
-    # Путь к весам encoder (если нужно вручную загружать)
-    encoder_weights_path = "predictor_multiclass_segmentation/model/resnet34-333f7ec4.pth"
+def load_model(checkpoint_path,encoder_weights_path, num_classes, device="cpu"):
+
 
     # Загружаем веса encoder
     encoder_state_dict = torch.load(encoder_weights_path, weights_only=False)
@@ -97,7 +96,7 @@ def predict_and_save(model, dataloader, save_dir, class_to_color, device="cpu"):
                 pred_pil.save(os.path.join(save_dir, filename))
 
 # === Основная функция ===
-def main_prediction(input_directory, output_directory, checkpoint_path):
+def main_prediction(input_directory, output_directory, checkpoint_path, encoder_weights_path):
     device = "cuda" if torch.cuda.is_available() else "cpu"
     num_classes = len(class_to_color)
 
@@ -109,12 +108,13 @@ def main_prediction(input_directory, output_directory, checkpoint_path):
     dataset = PredictionDataset(input_directory, transform)
     dataloader = DataLoader(dataset, batch_size=8, shuffle=False)
 
-    model = load_model(checkpoint_path, num_classes, device)
+    model = load_model(checkpoint_path, encoder_weights_path, num_classes, device)
     predict_and_save(model, dataloader, output_directory, class_to_color, device)
 
 if __name__ == "__main__":
     input_directory = r"temp/img_features_join"
     checkpoint_path = r"predictor_multiclass_segmentation\model\model_epoch_31.pth"
+    encoder_weights_path = r"predictor_multiclass_segmentation\model\resnet34-333f7ec4.pth"
     output_directory = r"temp/img_features_join_multi_class"
 
-    main_prediction(input_directory, output_directory, checkpoint_path)
+    main_prediction(input_directory, output_directory, checkpoint_path, encoder_weights_path)
