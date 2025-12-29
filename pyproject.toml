@@ -23,6 +23,7 @@ dependencies = [
     "segmentation-models-pytorch>=0.3",
     "tqdm>=4.64"
 ]
-
+[tool.setuptools.packages.find]
+where = ["musac_las_classifier"]
 [project.urls]
 "Homepage" = "https://github.com/AlexeyKozhakin/lidar-visual-interface"
