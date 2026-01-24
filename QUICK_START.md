@@ -52,4 +52,4 @@ pipeline.export_las("example_data/las_output")
 
 ### 4. Video turorial
 
-[Whatch video](https://opentopography.org/data)
+[Whatch video](https://drive.google.com/file/d/1oi5J1lDz-6PCoYGv-mn5n2uQ_4vNptqj/view)
