@@ -1,0 +1,102 @@
+﻿% ArXiv-style draft (skeleton)
+% Fill TODO blocks with project-specific details.
+\documentclass[11pt]{article}
+
+\usepackage[utf8]{inputenc}
+\usepackage[T1]{fontenc}
+\usepackage{lmodern}
+\usepackage{microtype}
+\usepackage{amsmath,amssymb}
+\usepackage{graphicx}
+\usepackage{booktabs}
+\usepackage{caption}
+\usepackage{subcaption}
+\usepackage{hyperref}
+\usepackage{geometry}
+\geometry{margin=1in}
+
+\title{\textbf{From 3D LiDAR to 2D Segmentation and Back: A Practical Pipeline for Building Footprints and Multiclass Point-Cloud Labeling}}
+
+\author{\textbf{Alexey Kozhakin}\\
+Affiliation\\
+\texttt{email@example.com}
+\and
+\textbf{Advisor Name}\\
+Affiliation\\
+\texttt{email@example.com}
+}
+
+\date{\today}
+
+\begin{document}
+\maketitle
+
+\begin{abstract}
+% TODO: 3--5 sentences: problem, method (3D->2D->3D pipeline), datasets (STPLS3D + Malta), key results.
+\end{abstract}
+
+\section{Introduction}
+% TODO: Motivation, challenges in LiDAR processing, importance of building footprints and multiclass labeling.
+% TODO: State contributions (2--4 bullets).
+
+\section{Related Work}
+% TODO: Prior work on 3D point cloud segmentation, 2D projections for LiDAR, building footprint extraction.
+
+\section{Method}
+\subsection{Overview}
+% TODO: High-level pipeline: tiling -> feature encoding -> 2D segmentation -> stitching -> polygons -> 3D back-projection.
+
+\subsection{Data Preprocessing and Tiling}
+% TODO: LAS input, 250m x 250m tiling, point limit, normalization, dataset naming (Malta file naming).
+
+\subsection{3D-to-2D Feature Encoding}
+% TODO: Grid size 512x512, KNN K=4, features z\_mean (smoothed), n\_z, n\_r, RGB, class mode.
+
+\subsection{2D Segmentation Models}
+% TODO: U-Net + ResNet34 encoder, binary building model, multiclass model, loss, optimizer.
+
+\subsection{Post-processing and Polygon Generation}
+% TODO: Stitching tiles, contour detection, min area filtering, shapefile export.
+
+\subsection{3D Back-Projection}
+% TODO: Nearest-neighbor interpolation from 2D masks to 3D points, class + RGB in LAS.
+
+\section{Experiments}
+\subsection{Datasets}
+% TODO: STPLS3D splits and stats; Malta inference areas (St Pauls Bay, Xewkija, Gozo Rabat, Sliema).
+
+\subsection{Training Protocol}
+% TODO: epochs, batch size, LR, optimizer, augmentations, hardware.
+
+\subsection{Metrics}
+% TODO: IoU/mIoU, F1, Precision/Recall, per-class where applicable.
+
+\subsection{Baselines}
+% TODO: If any; otherwise explain absence and focus on pipeline.
+
+\section{Results}
+\subsection{Quantitative Results}
+% TODO: Table with metrics for STPLS3D (binary and multiclass).
+
+\subsection{Qualitative Results}
+% TODO: Figures for feature maps, segmentation outputs, polygons, 3D colored LAS.
+
+\section{Ablations}
+% TODO: Feature channels, KNN K, grid size, smoothing, point limit.
+
+\section{Applications}
+% TODO: GIS footprints, urban planning, infrastructure mapping.
+
+\section{Limitations}
+% TODO: Projection loss, density sensitivity, generalization limits.
+
+\section{Conclusion and Future Work}
+% TODO: Summary and next steps.
+
+\section*{Acknowledgements}
+% TODO: Funding, collaborators, datasets.
+
+\bibliographystyle{unsrt}
+\bibliography{refs}
+
+\end{document}

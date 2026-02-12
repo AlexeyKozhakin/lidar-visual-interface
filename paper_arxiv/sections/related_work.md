@@ -1,0 +1,20 @@
+﻿# 2. Related Work
+
+Urban-scale 3D point cloud understanding has progressed through three main methodological families: point-based neural models, graph/hybrid deep models, and classical feature-engineered methods. The first major break from voxel-heavy pipelines came from PointNet, which introduced direct learning on unordered point sets with shared pointwise MLPs and a symmetric aggregation function [@qi2017pointnet]. This formulation established a simple and scalable baseline, but with limited explicit modeling of local neighborhoods. PointNet++ addressed this limitation by introducing hierarchical local feature learning through sampling, grouping, and recursive set abstraction [@qi2017pointnetpp]. In practice, this shift was important for scenes where fine-grained geometry and density variation matter.
+
+Graph-based deep learning further improved local geometric modeling by dynamically updating neighborhood structure in feature space. DGCNN and its EdgeConv operator model relations between nearby points across layers, capturing local context more explicitly than purely pointwise pipelines [@wang2019dgcnn]. These approaches often improve segmentation quality on complex shapes, but they increase computational and memory cost due to repeated neighborhood construction. For large urban scenes, this trade-off remains central: richer local structure modeling versus practical inference efficiency.
+
+In parallel, benchmark datasets have become a key bottleneck and driver of progress. STPLS3D, introduced in the original CVPR 2021 benchmark paper, provides a challenging urban-scale benchmark and has become a common reference for semantic segmentation protocols and metrics in outdoor dense scenes [@hu2021stpls3d]. H3D (Hessigheim 3D) adds another high-resolution benchmark perspective with UAV LiDAR and multi-view stereo data, supporting evaluation under different acquisition conditions [@kolle2021h3d]. More recent urban dataset contributions, including YTU3D and DublinCity, emphasize class diversity, dense city-scale coverage, and practical benchmark construction for real-world urban management workflows [@bayrak2024ytu3d; @zolanvari2019dublincity].
+
+Beyond deep models, classical machine-learning pipelines remain relevant in operational settings where interpretability and lightweight deployment are prioritized. Random Forest-based urban point cloud classification is one such line of work, typically relying on engineered geometric/radiometric features [@alfio2024randomforesturban]. While classical approaches can be effective in specific domains, they generally show reduced representation flexibility compared to modern deep models in large heterogeneous scenes.
+
+Survey and practice-oriented sources help position current work in this broader landscape. Recent systematic reviews summarize deep point cloud classification families, common datasets, and open challenges, including generalization across domains and computational constraints [@zhang2023survey3dclassification]. Practical 3D workflow literature also stresses that production pipelines must balance data quality, algorithmic complexity, and deployment constraints, especially for spatial AI and geospatial applications [@poux2025data3dscience].
+
+Our work is positioned in this practical gap: rather than introducing a new foundational 3D architecture, we focus on an end-to-end, deployment-oriented pipeline that maps 3D LiDAR to 2D feature space for efficient segmentation and then projects predictions back to 3D for GIS-ready outputs. This design explicitly targets urban operational use, where robustness, throughput, and downstream interoperability are often as important as raw model novelty.
+
+TODO:
+- Verify all citation metadata in `paper_arxiv/refs.bib` (authors, venue, year, DOI/arXiv).
+- Add exact references for STPLS3D dataset statistics and benchmark protocol details.
+- Add one sentence with explicit positioning against PointNet/PointNet++/DGCNN in terms of goal (practical pipeline vs architecture novelty).
+- If required by target journal, reduce to 3--5 concise paragraphs and move dataset-specific comparison to Experiments.
+
