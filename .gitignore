@@ -1,22 +1,27 @@
+# Project data & models
+data/
+models/*.pth
+checkpoints*/
+workdir/
 example_data
-/predictor_building_segmentation
-venv*
-training/notebook/data/
-training/notebook/checkpoints_multiclass_metrics
+*.las
+
+# Project artifacts
 img_predict/
 log.txt
 polygons_shp/
 project_*
 tensors/
-
-
-test
-temp*
 output_tiles/
-dist.zip
-predictor_building_segmentation\model\*
+temp*
 temp/
 temp_history/
+test
+dist.zip
+
+# Training data
+training/notebook/data/
+training/notebook/checkpoints_multiclass_metrics
 # Byte-compiled / optimized / DLL files
 __pycache__/
 *.py[cod]

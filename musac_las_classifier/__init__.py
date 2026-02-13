@@ -1,13 +1,12 @@
-from .las_classification_pipeline import (
-    LasClassificationPipeline,
-    LasPipelineConfig
-)
+"""
+musac_las_classifier — End-to-end LiDAR point cloud classification pipeline.
 
-from .preprocessing import config_preprocessing
-from .predictor_multiclass_segmentation import config_prediction
-from .generate_colored_las_3D import config_colored_las
+Converts raw LAS files to 2D feature images, runs U-Net segmentation,
+and projects predictions back to 3D for GIS-ready outputs.
+"""
 
-__all__ = ["LasClassificationPipeline", "LasPipelineConfig", 
-           "config_preprocessing", 
-           "config_prediction", 
-           "config_colored_las"]
+from musac_las_classifier.config import PipelineConfig
+from musac_las_classifier.pipeline import LasClassificationPipeline
+
+__all__ = ["LasClassificationPipeline", "PipelineConfig"]
+__version__ = "0.2.0"
