@@ -73,7 +73,7 @@ def load_las_to_numpy(file_path, num_points_lim=DEFAULT_NUM_POINTS_LIM):
     return np.hstack((sampled_points, sampled_classes.reshape(-1, 1)))
 
 
-def get_knn_data(data, M, K):
+def get_knn_data(data, M, K, knn_eps=0.0, knn_workers=1):
     """Find K nearest neighbors for each point on an M x M grid.
 
     Args:
@@ -97,7 +97,19 @@ def get_knn_data(data, M, K):
 
     tree = cKDTree(data[:, :2])
     grid_flat = grid.reshape(-1, 2)
-    _, knn_indices = tree.query(grid_flat, k=K)
+    query_kwargs = {"k": K}
+    if knn_eps and knn_eps > 0:
+        query_kwargs["eps"] = knn_eps
+    if knn_workers is not None:
+        query_kwargs["workers"] = knn_workers
+
+    try:
+        _, knn_indices = tree.query(grid_flat, **query_kwargs)
+    except TypeError:
+        # Backward compatibility with older SciPy versions that do not
+        # support "workers".
+        query_kwargs.pop("workers", None)
+        _, knn_indices = tree.query(grid_flat, **query_kwargs)
     knn_data = data[knn_indices].reshape(M, M, K, D)
 
     return knn_data, grid
@@ -195,14 +207,20 @@ def compute_features(data_knn, grid, feature_input_tensor, feature_output_tensor
 
 def _process_single_file(filename, input_directory, output_directory,
                          feature_input_tensor, feature_output_tensor,
-                         num_points_lim, M, K):
+                         num_points_lim, M, K, knn_eps, knn_workers):
     """Encode a single LAS file to a feature tensor."""
     input_file = os.path.join(input_directory, filename)
     name, _ = os.path.splitext(filename)
     output_file = os.path.join(output_directory, name)
 
     data_org = load_las_to_numpy(input_file, num_points_lim=num_points_lim)
-    data_knn, grid = get_knn_data(data_org, M, K)
+    data_knn, grid = get_knn_data(
+        data_org,
+        M,
+        K,
+        knn_eps=knn_eps,
+        knn_workers=knn_workers,
+    )
     logger.info("Encoding %s", filename)
     data_result = compute_features(
         data_knn, grid, feature_input_tensor, feature_output_tensor, m_tensor_size=M
@@ -214,7 +232,7 @@ def encode_las_to_tensors(input_directory, output_directory,
                           feature_input_tensor=None, feature_output_tensor=None,
                           num_points_lim=DEFAULT_NUM_POINTS_LIM,
                           M=DEFAULT_M_TENSOR_SIZE, K=DEFAULT_K_NN,
-                          parallel=False):
+                          parallel=False, knn_eps=0.0, knn_workers=1):
     """Encode all LAS files in a directory to feature tensors.
 
     Args:
@@ -244,7 +262,7 @@ def encode_las_to_tensors(input_directory, output_directory,
     args_list = [
         (f, input_directory, output_directory,
          feature_input_tensor, feature_output_tensor,
-         num_points_lim, M, K)
+         num_points_lim, M, K, knn_eps, knn_workers)
         for f in filenames
     ]
 
