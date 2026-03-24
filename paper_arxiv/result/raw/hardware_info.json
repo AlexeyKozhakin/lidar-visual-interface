@@ -1,0 +1,11 @@
+{
+  "cpu_model": "x86_64",
+  "python_version": "3.12.12",
+  "torch_version": "2.10.0+cu128",
+  "device_used": "cuda",
+  "cuda_available": true,
+  "cuda_version": "12.8",
+  "gpu_model": "Tesla T4",
+  "gpu_count": 1,
+  "ram_gb": 12.7
+}

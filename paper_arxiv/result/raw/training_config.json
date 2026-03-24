@@ -1,0 +1,23 @@
+{
+  "raw_las_dir": "data/stpls3d/raw",
+  "cut_las_dir": "data/stpls3d/las_cut",
+  "tensor_dir": "data/stpls3d/tensors",
+  "img_features_dir": "data/stpls3d/img_features",
+  "img_class_dir": "data/stpls3d/img_class",
+  "num_epochs": 50,
+  "batch_size": 4,
+  "learning_rate": 0.001,
+  "train_ratio": 0.8,
+  "encoder_name": "resnet34",
+  "num_classes": 20,
+  "in_channels": 3,
+  "device": "auto",
+  "seed": 42,
+  "checkpoint_dir": "/content/drive/MyDrive/lidar_runs/run_001/checkpoints_notebook",
+  "metrics_csv": "/content/drive/MyDrive/lidar_runs/run_001/checkpoints_notebook/metrics_log.csv",
+  "epoch_summary_csv": "/content/drive/MyDrive/lidar_runs/run_001/checkpoints_notebook/epoch_summary.csv",
+  "best_model_path": "/content/drive/MyDrive/lidar_runs/run_001/checkpoints_notebook/best_model.pth",
+  "config_json_path": "/content/drive/MyDrive/lidar_runs/run_001/checkpoints_notebook/training_config.json",
+  "confusion_matrix_dir": "/content/drive/MyDrive/lidar_runs/run_001/checkpoints_notebook/confusion_matrices",
+  "plots_dir": "/content/drive/MyDrive/lidar_runs/run_001/checkpoints_notebook/plots"
+}

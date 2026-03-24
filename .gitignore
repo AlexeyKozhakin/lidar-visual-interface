@@ -199,3 +199,4 @@ cython_debug/
 
 # Claude Code
 .claude/
+paper_arxiv/references/pdfs/

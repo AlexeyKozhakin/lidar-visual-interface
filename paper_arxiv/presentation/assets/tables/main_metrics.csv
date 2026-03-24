@@ -1,0 +1,6 @@
+﻿metric,value
+mIoU_multiclass,0.2786
+Building_IoU,0.8069
+Binary_F1,0.8931
+Binary_Precision,0.9019
+Binary_Recall,0.8845

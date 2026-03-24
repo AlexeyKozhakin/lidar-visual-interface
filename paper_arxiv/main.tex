@@ -299,6 +299,18 @@ The binary building model collapses this taxonomy into two classes: building and
     \end{tabular}
 \end{table}
 
+\paragraph{Dataset sample visualization.}
+To illustrate how the prepared data are structured, we include representative samples from the train/validation/test splits.
+Each sample contains three aligned artifacts: \texttt{img\_rgb} (RGB projection), \texttt{img\_features} (engineered feature image), and \texttt{img\_class} (semantic ground-truth mask).
+
+\begin{figure}[t]
+    \centering
+    \includegraphics[width=\linewidth]{figures/dataset_examples.png}
+    \caption{Examples of aligned STPLS3D-derived training artifacts. Rows correspond to train/val/test splits; columns show RGB projection (\texttt{img\_rgb}), feature tensor visualization (\texttt{img\_features}), and semantic mask (\texttt{img\_class}).}
+    \label{fig:dataset_examples}
+\end{figure}
+% TODO: create figures/dataset_examples.png as a 3x3 panel (train/val/test x rgb/features/class).
+
 \subsection{Training Protocol}
 \label{sec:experiments_training}
 
@@ -331,11 +343,8 @@ For the binary building model, we report the building-class IoU, F1 score, preci
 \subsection{Baselines}
 \label{sec:experiments_baselines}
 
-To contextualize our results, we compare against published benchmark results on STPLS3D from representative 3D segmentation architectures:
-PointNet~\cite{qi2017pointnet},
-PointNet++~\cite{qi2017pointnetpp},
-and DGCNN~\cite{wang2019dgcnn}.
-We emphasize that this comparison is not strictly apples-to-apples: the baseline methods operate directly on 3D point sets, while our pipeline projects to 2D before segmentation.
+To contextualize our results, we report representative baseline numbers from the benchmark table in Hu et al.~\cite{hu2021stpls3d}, where mIoU and class-wise IoU (including Building IoU) are explicitly published for several models.
+We emphasize that this comparison is not strictly apples-to-apples: those baseline numbers are reported on the SensatUrban benchmark in that paper, while our pipeline here is trained/evaluated on STPLS3D with a project-specific split.
 The comparison is intended to provide context for our metric values rather than to claim architectural superiority.
 Our contribution lies in the complete end-to-end pipeline from raw LAS to GIS-ready outputs, not in the segmentation model itself.
 
@@ -352,16 +361,17 @@ Table~\ref{tab:main_results} summarizes the segmentation performance of our pipe
 
 \begin{table}[t]
     \centering
-    \caption{Segmentation results on the STPLS3D validation set. Baseline numbers are taken from published benchmark results. Our pipeline uses a 2D projection approach (3D$\rightarrow$2D$\rightarrow$3D) rather than direct 3D processing.}
+    \caption{Segmentation results and contextual baselines. Baseline mIoU and Building IoU are taken from Table 2 in~\cite{hu2021stpls3d} (SensatUrban benchmark). Our pipeline numbers are from STPLS3D validation, so cross-row comparison is indicative only.}
     \label{tab:main_results}
     \small
     \begin{tabular}{lccccc}
         \toprule
         Method & Approach & mIoU & Building IoU & F1 & Prec / Rec \\
         \midrule
-        PointNet~\cite{qi2017pointnet} & 3D direct & \placeholder{BL\_POINTNET\_MIOU} & --- & --- & --- \\
-        PointNet++~\cite{qi2017pointnetpp} & 3D direct & \placeholder{BL\_POINTNETPP\_MIOU} & --- & --- & --- \\
-        DGCNN~\cite{wang2019dgcnn} & 3D direct & \placeholder{BL\_DGCNN\_MIOU} & --- & --- & --- \\
+        PointNet~\cite{qi2017pointnet,hu2021stpls3d} & 3D direct & 0.2371 & 0.8005 & --- & --- \\
+        PointNet++~\cite{qi2017pointnetpp,hu2021stpls3d} & 3D direct & 0.3292 & 0.8477 & --- & --- \\
+        RandLA-Net~\cite{hu2021stpls3d} & 3D direct & 0.5269 & 0.9158 & --- & --- \\
+        KPConv~\cite{hu2021stpls3d} & 3D direct & 0.5758 & 0.9533 & --- & --- \\
         \midrule
         Ours (Multiclass) & 3D$\rightarrow$2D$\rightarrow$3D & \placeholder{METRIC\_STPLS3D\_MIOU\_MULTICLASS} & \placeholder{METRIC\_STPLS3D\_IOU\_BUILDING} & --- & --- \\
         Ours (Binary) & 3D$\rightarrow$2D$\rightarrow$3D & --- & \placeholder{METRIC\_STPLS3D\_IOU\_BUILDING} & \placeholder{METRIC\_STPLS3D\_F1\_BINARY} & \placeholder{METRIC\_STPLS3D\_PRECISION\_BINARY} / \placeholder{METRIC\_STPLS3D\_RECALL\_BINARY} \\
