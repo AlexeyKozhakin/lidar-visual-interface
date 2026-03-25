@@ -6,7 +6,11 @@ from PIL import Image
 from torch.utils.data import Dataset, DataLoader
 import torchvision.transforms as T
 import segmentation_models_pytorch as smp
-from torchvision.models import resnet34
+
+
+DEFAULT_MODEL_DIR = Path(__file__).resolve().parent / "model"
+DEFAULT_ENCODER_WEIGHTS_PATH = DEFAULT_MODEL_DIR / "resnet34-333f7ec4.pth"
+DEFAULT_CHECKPOINT_PATH = DEFAULT_MODEL_DIR / "model_epoch_25.pth"
 
 class PredictionDataset(Dataset):
     def __init__(self, image_dir, transform=None):
@@ -25,12 +29,12 @@ class PredictionDataset(Dataset):
         return image, image_path.name
 
 
-def load_model(checkpoint_path, device="cpu"):
-    # Path to encoder weights
-    encoder_weights_path = "predictor_building_segmentation/model/resnet34-333f7ec4.pth"
+def load_model(checkpoint_path, encoder_weights_path=None, device="cpu"):
+    checkpoint_path = Path(checkpoint_path)
+    encoder_weights_path = Path(encoder_weights_path or DEFAULT_ENCODER_WEIGHTS_PATH)
     
     # Load encoder weights from .pth file (required: weights_only=False)
-    encoder_state_dict = torch.load(encoder_weights_path, weights_only=False)
+    encoder_state_dict = torch.load(encoder_weights_path, map_location=device, weights_only=False)
 
     # Create model with disabled automatic weight loading
     model = smp.Unet(
@@ -67,22 +71,33 @@ def predict_and_save(model, dataloader, save_dir, device="cpu"):
                 pred_pil = Image.fromarray(pred_image, mode="L")  # B/W image
                 pred_pil.save(os.path.join(save_dir, filename))
 
-def main_prediction(input_directory, output_directory, checkpoint_path):
+def main_prediction(
+    input_directory,
+    output_directory,
+    checkpoint_path,
+    encoder_weights_path=None,
+    device="cpu",
+    batch_size=8,
+):
     transform = T.Compose([
         T.ToTensor(),
         #T.Resize((64, 64))
     ])
     
     dataset = PredictionDataset(input_directory, transform)
-    dataloader = DataLoader(dataset, batch_size=8, shuffle=False)
+    dataloader = DataLoader(dataset, batch_size=batch_size, shuffle=False)
     
-    model = load_model(checkpoint_path)
-    predict_and_save(model, dataloader, output_directory)
+    model = load_model(
+        checkpoint_path,
+        encoder_weights_path=encoder_weights_path,
+        device=device,
+    )
+    predict_and_save(model, dataloader, output_directory, device=device)
 
 if __name__ == "__main__":
 
     input_directory = "temp/img_features"
-    checkpoint_path = "predictor_building_segmentation/model/model_epoch_25.pth"
+    checkpoint_path = DEFAULT_CHECKPOINT_PATH
     output_directory = "temp/img_predict"
     
     main_prediction(input_directory, output_directory, checkpoint_path)

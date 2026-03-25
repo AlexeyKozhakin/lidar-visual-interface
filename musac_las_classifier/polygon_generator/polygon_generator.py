@@ -1,9 +1,9 @@
 import os
 import cv2
 import numpy as np
+from pathlib import Path
 from PIL import Image
 import shapefile  # pyshp
-import polygon_generator.config_polygon_generator as cpg
 
 
 def process_image(input_path, output_image_path, output_shp_path, min_area=100, contour_thickness=3):
@@ -59,17 +59,20 @@ def process_image(input_path, output_image_path, output_shp_path, min_area=100, 
 
 
 def main_polygon_generator(input_dir, output_image_dir, output_shp_dir, min_area=100, contour_thickness=3):
+    input_dir = Path(input_dir)
+    output_image_dir = Path(output_image_dir)
+    output_shp_dir = Path(output_shp_dir)
+
     os.makedirs(output_image_dir, exist_ok=True)
     os.makedirs(output_shp_dir, exist_ok=True)
 
-    for filename in os.listdir(input_dir):
-        if filename.lower().endswith((".png", ".jpg", ".jpeg")):
-            input_path = os.path.join(input_dir, filename)
-            name_wo_ext = os.path.splitext(filename)[0]
-            output_image_path = os.path.join(output_image_dir, name_wo_ext + ".png")
-            output_shp_path = os.path.join(output_shp_dir, name_wo_ext)
+    for input_path in sorted(input_dir.iterdir()):
+        if input_path.is_file() and input_path.suffix.lower() in {".png", ".jpg", ".jpeg"}:
+            name_wo_ext = input_path.stem
+            output_image_path = output_image_dir / f"{name_wo_ext}.png"
+            output_shp_path = output_shp_dir / name_wo_ext
 
-            print(f"Processing: {filename}")
+            print(f"Processing: {input_path.name}")
             process_image(input_path, output_image_path, output_shp_path,
                           min_area=min_area, contour_thickness=contour_thickness)
             print(f" -> Contours: {output_image_path}")
@@ -77,6 +80,8 @@ def main_polygon_generator(input_dir, output_image_dir, output_shp_dir, min_area
             
 
 if __name__ == "__main__":
+    from musac_las_classifier.polygon_generator import config_polygon_generator as cpg
+
     # Path to folders from config
     input_dir = cpg.path_image_prediction
     output_image_dir = cpg.path_image_contours

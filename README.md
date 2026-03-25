@@ -107,6 +107,109 @@ pip install -r requirements_3d_las_colored_app.txt
 
 ## Usage
 
+### Python Package API
+
+The repository can be used as a Python package through
+`musac_las_classifier.LasClassificationPipeline`.
+
+#### Install as a package
+
+```bash
+pip install -e .
+```
+
+#### Multi-class segmentation: recommended helper-style API
+
+This is the recommended package API for classified LAS generation.
+
+```python
+from musac_las_classifier import LasClassificationPipeline, LasPipelineConfig
+from musac_las_classifier import config_preprocessing as cp
+from musac_las_classifier import config_prediction as cpred
+from musac_las_classifier import config_colored_las as ccl
+
+config = LasPipelineConfig.for_multiclass(
+    tile_size=250,
+    feature_output_tensor=cp.feature_output_tensor,
+    channels_visualisation=cp.channels_visualisation,
+    checkpoint_path=cpred.checkpoint_path,
+    encoder_weights_path=cpred.encoder_weights_path,
+    class_colors=ccl.class_colors,
+)
+
+pipeline = LasClassificationPipeline(
+    config=config,
+    workdir="example_data/workdir_multiclass",
+)
+
+pipeline.load_las("example_data/las")
+pipeline.run()
+pipeline.export_las("example_data/las_output")
+```
+
+#### Multi-class segmentation: legacy config constructor
+
+The legacy constructor style still works and remains supported:
+
+```python
+from musac_las_classifier import LasClassificationPipeline, LasPipelineConfig
+from musac_las_classifier import config_preprocessing as cp
+from musac_las_classifier import config_prediction as cpred
+from musac_las_classifier import config_colored_las as ccl
+
+config = LasPipelineConfig(
+    tile_size=250,
+    feature_output_tensor=cp.feature_output_tensor,
+    channels_visualisation=cp.channels_visualisation,
+    checkpoint_path=cpred.checkpoint_path,
+    encoder_weights_path=cpred.encoder_weights_path,
+    class_colors=ccl.class_colors,
+)
+
+pipeline = LasClassificationPipeline(
+    config=config,
+    workdir="example_data/workdir_multiclass_legacy",
+)
+
+pipeline.load_las("example_data/las")
+pipeline.run()
+pipeline.export_las("example_data/las_output")
+```
+
+#### Polygon extraction: package workflow
+
+The polygon workflow uses the same preprocessing stages, then runs binary
+building prediction, stitches the scene-level prediction mask, and exports
+contours plus shapefiles.
+
+```python
+from musac_las_classifier import LasClassificationPipeline, LasPipelineConfig
+from musac_las_classifier import config_preprocessing as cp
+
+config = LasPipelineConfig.for_polygon_extraction(
+    tile_size=250,
+    feature_output_tensor=cp.feature_output_tensor,
+    channels_visualisation=cp.channels_visualisation,
+    min_polygon_area=500,
+    contour_thickness=3,
+)
+
+pipeline = LasClassificationPipeline(
+    config=config,
+    workdir="example_data/workdir_polygon",
+)
+
+pipeline.load_las("example_data/las")
+pipeline.run_polygon_extraction()
+```
+
+Polygon results will be written inside the pipeline workdir:
+
+- `img_predict_building/`
+- `img_predict_building_join/`
+- `img_contours/`
+- `polygons_shp/`
+
 ### Application 1: Polygon Generation
 
 #### Desktop Applications

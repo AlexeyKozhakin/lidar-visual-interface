@@ -37,8 +37,18 @@ from musac_las_classifier.predictor_multiclass_segmentation.predict_multiclass_s
     main_prediction
 )
 
+from musac_las_classifier.predictor_building_segmentation.predict_building_segmentation import (
+    DEFAULT_CHECKPOINT_PATH as DEFAULT_BUILDING_CHECKPOINT_PATH,
+    DEFAULT_ENCODER_WEIGHTS_PATH as DEFAULT_BUILDING_ENCODER_WEIGHTS_PATH,
+    main_prediction as main_building_prediction
+)
+
 from musac_las_classifier.postprocessing.join_img import (
     main_join_img
+)
+
+from musac_las_classifier.polygon_generator.polygon_generator import (
+    main_polygon_generator
 )
 
 from musac_las_classifier.generate_colored_las_3D.generate_class_las_3D import (
@@ -97,12 +107,24 @@ class LasPipelineConfig:
 
     checkpoint_path: Optional[str] = None
     encoder_weights_path: Optional[str] = None
+    building_checkpoint_path: Optional[str] = str(DEFAULT_BUILDING_CHECKPOINT_PATH)
+    building_encoder_weights_path: Optional[str] = str(DEFAULT_BUILDING_ENCODER_WEIGHTS_PATH)
+    min_polygon_area: int = 100
+    contour_thickness: int = 3
 
     # =====================
     # Output
     # =====================
 
     class_colors: Optional[dict] = None
+
+    @classmethod
+    def for_multiclass(cls, **kwargs):
+        return cls(**kwargs)
+
+    @classmethod
+    def for_polygon_extraction(cls, **kwargs):
+        return cls(**kwargs)
 
 
 # =========================
@@ -126,6 +148,10 @@ class LasClassificationPipeline:
         self.img_features_dir = self.workdir / "img_features"
         self.img_pred_dir = self.workdir / "img_predict_multiclass"
         self.img_join_dir = self.workdir / "img_predict_multiclass_join"
+        self.img_pred_building_dir = self.workdir / "img_predict_building"
+        self.img_join_building_dir = self.workdir / "img_predict_building_join"
+        self.img_contours_dir = self.workdir / "img_contours"
+        self.polygons_shp_dir = self.workdir / "polygons_shp"
 
         self._create_directories()
 
@@ -141,6 +167,10 @@ class LasClassificationPipeline:
             self.img_features_dir,
             self.img_pred_dir,
             self.img_join_dir,
+            self.img_pred_building_dir,
+            self.img_join_building_dir,
+            self.img_contours_dir,
+            self.polygons_shp_dir,
         ]:
             d.mkdir(parents=True, exist_ok=True)
 
@@ -205,6 +235,39 @@ class LasClassificationPipeline:
             str(self.img_join_dir),
         )
 
+    def predict_buildings(self):
+        """Run binary building segmentation model"""
+        main_building_prediction(
+            str(self.img_features_dir),
+            str(self.img_pred_building_dir),
+            self.config.building_checkpoint_path,
+            encoder_weights_path=self.config.building_encoder_weights_path,
+        )
+
+    def postprocess_buildings(self):
+        """Join predicted building image tiles"""
+        main_join_img(
+            str(self.img_pred_building_dir),
+            str(self.img_join_building_dir),
+        )
+
+    def export_polygons(
+        self,
+        output_shp_dir: Optional[str] = None,
+        output_image_dir: Optional[str] = None,
+    ):
+        """Generate polygons from joined building prediction images"""
+        shp_dir = Path(output_shp_dir) if output_shp_dir else self.polygons_shp_dir
+        image_dir = Path(output_image_dir) if output_image_dir else self.img_contours_dir
+
+        main_polygon_generator(
+            str(self.img_join_building_dir),
+            str(image_dir),
+            str(shp_dir),
+            min_area=self.config.min_polygon_area,
+            contour_thickness=self.config.contour_thickness,
+        )
+
     def export_las(
         self,
         output_las_path: str,
@@ -234,3 +297,16 @@ class LasClassificationPipeline:
         self.prepare_features()
         self.predict()
         self.postprocess()
+
+    def run_polygon_extraction(
+        self,
+        output_shp_dir: Optional[str] = None,
+        output_image_dir: Optional[str] = None,
+    ):
+        """Run full polygon extraction workflow"""
+        self.slice_las()
+        self.transform_to_tensor()
+        self.prepare_features()
+        self.predict_buildings()
+        self.postprocess_buildings()
+        self.export_polygons(output_shp_dir=output_shp_dir, output_image_dir=output_image_dir)
