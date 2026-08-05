@@ -1,0 +1,1521 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+  <meta charset="utf-8" />
+  <meta name="generator" content="pandoc" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes" />
+  <title>paper_draft_v2</title>
+  <style>
+    /* Default styles provided by pandoc.
+    ** See https://pandoc.org/MANUAL.html#variables-for-html for config info.
+    */
+    html {
+      color: #1a1a1a;
+      background-color: #fdfdfd;
+    }
+    body {
+      margin: 0 auto;
+      max-width: 36em;
+      padding-left: 50px;
+      padding-right: 50px;
+      padding-top: 50px;
+      padding-bottom: 50px;
+      hyphens: auto;
+      overflow-wrap: break-word;
+      text-rendering: optimizeLegibility;
+      font-kerning: normal;
+    }
+    @media (max-width: 600px) {
+      body {
+        font-size: 0.9em;
+        padding: 12px;
+      }
+      h1 {
+        font-size: 1.8em;
+      }
+    }
+    @media print {
+      html {
+        background-color: white;
+      }
+      body {
+        background-color: transparent;
+        color: black;
+        font-size: 12pt;
+      }
+      p, h2, h3 {
+        orphans: 3;
+        widows: 3;
+      }
+      h2, h3, h4 {
+        page-break-after: avoid;
+      }
+    }
+    p {
+      margin: 1em 0;
+    }
+    a {
+      color: #1a1a1a;
+    }
+    a:visited {
+      color: #1a1a1a;
+    }
+    img {
+      max-width: 100%;
+    }
+    svg {
+      height: auto;
+      max-width: 100%;
+    }
+    h1, h2, h3, h4, h5, h6 {
+      margin-top: 1.4em;
+    }
+    h5, h6 {
+      font-size: 1em;
+      font-style: italic;
+    }
+    h6 {
+      font-weight: normal;
+    }
+    ol, ul {
+      padding-left: 1.7em;
+      margin-top: 1em;
+    }
+    li > ol, li > ul {
+      margin-top: 0;
+    }
+    blockquote {
+      margin: 1em 0 1em 1.7em;
+      padding-left: 1em;
+      border-left: 2px solid #e6e6e6;
+      color: #606060;
+    }
+    code {
+      font-family: Menlo, Monaco, Consolas, 'Lucida Console', monospace;
+      font-size: 85%;
+      margin: 0;
+      hyphens: manual;
+    }
+    pre {
+      margin: 1em 0;
+      overflow: auto;
+    }
+    pre code {
+      padding: 0;
+      overflow: visible;
+      overflow-wrap: normal;
+    }
+    .sourceCode {
+     background-color: transparent;
+     overflow: visible;
+    }
+    hr {
+      border: none;
+      border-top: 1px solid #1a1a1a;
+      height: 1px;
+      margin: 1em 0;
+    }
+    table {
+      margin: 1em 0;
+      border-collapse: collapse;
+      width: 100%;
+      overflow-x: auto;
+      display: block;
+      font-variant-numeric: lining-nums tabular-nums;
+    }
+    table caption {
+      margin-bottom: 0.75em;
+    }
+    tbody {
+      margin-top: 0.5em;
+      border-top: 1px solid #1a1a1a;
+      border-bottom: 1px solid #1a1a1a;
+    }
+    th {
+      border-top: 1px solid #1a1a1a;
+      padding: 0.25em 0.5em 0.25em 0.5em;
+    }
+    td {
+      padding: 0.125em 0.5em 0.25em 0.5em;
+    }
+    header {
+      margin-bottom: 4em;
+      text-align: center;
+    }
+    #TOC li {
+      list-style: none;
+    }
+    #TOC ul {
+      padding-left: 1.3em;
+    }
+    #TOC > ul {
+      padding-left: 0;
+    }
+    #TOC a:not(:hover) {
+      text-decoration: none;
+    }
+    code{white-space: pre-wrap;}
+    span.smallcaps{font-variant: small-caps;}
+    div.columns{display: flex; gap: min(4vw, 1.5em);}
+    div.column{flex: auto; overflow-x: auto;}
+    div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+    /* The extra [class] is a hack that increases specificity enough to
+       override a similar rule in reveal.js */
+    ul.task-list[class]{list-style: none;}
+    ul.task-list li input[type="checkbox"] {
+      font-size: inherit;
+      width: 0.8em;
+      margin: 0 0.8em 0.2em -1.6em;
+      vertical-align: middle;
+    }
+  </style>
+  <script defer=""
+  src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml-full.js"
+  type="text/javascript"></script>
+</head>
+<body>
+<p>## 📋 DRAFT STATUS — TODO Tracker</p>
+<blockquote>
+<p><strong>v2 changes from v1:</strong> - Fixed epoch number
+inconsistency (Section 4.2 → epoch 45 throughout) - Fixed figure
+numbering (pipeline=Fig 1, dataset=Fig 2, training curves=Fig 3, Malta
+feature maps=Fig 4, building seg=Fig 5, multiclass=Fig 6) - Fixed
+training dataset citation in Section 4.1 (STPLS3D →
+<code>@chen2022stpls3dapr</code>) - Restructured Table 2 to clearly
+separate SensatUrban baselines from STPLS3D results - Added KPConv
+original citation <code>@thomas2019kpconv</code> and RandLA-Net
+<code>@hu2020randlanet</code> - Added Duran/Atik 2022 (SegUNet3D) to
+Related Work — projection-based methods paragraph - Added Wang et
+al. 2023 (SMAnet) to Related Work — urban airborne LiDAR paragraph</p>
+</blockquote>
+<table>
+<colgroup>
+<col style="width: 8%" />
+<col style="width: 29%" />
+<col style="width: 16%" />
+<col style="width: 21%" />
+<col style="width: 24%" />
+</colgroup>
+<thead>
+<tr>
+<th>#</th>
+<th>TODO Item</th>
+<th>Type</th>
+<th>Status</th>
+<th>Comment</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>1</td>
+<td>Confirm author order and emails</td>
+<td>Admin</td>
+<td>🔴 Not done</td>
+<td>Author names are present, but order/emails are not finalized.</td>
+</tr>
+<tr>
+<td>2</td>
+<td>Fill STPLS3D tile count (16 or 64)</td>
+<td>Data</td>
+<td>✅ Done</td>
+<td>Replaced with actual split: train 230 / val 50 / test 42 (total
+322).</td>
+</tr>
+<tr>
+<td>3</td>
+<td>Add Malta dataset description (sizes, CRS)</td>
+<td>Data</td>
+<td>🔴 Not done</td>
+<td>Malta dataset metadata is still missing.</td>
+</tr>
+<tr>
+<td>4</td>
+<td>Fill hardware specs (GPU, CPU, RAM)</td>
+<td>Data</td>
+<td>✅ Done</td>
+<td>Hardware section includes Tesla T4, x86_64 CPU, and 12.7 GB
+RAM.</td>
+</tr>
+<tr>
+<td>5</td>
+<td>Run evaluation — fill all metric placeholders (mIoU, IoU, F1, Prec,
+Rec)</td>
+<td>Experiment</td>
+<td>🟡 Partial</td>
+<td>Core quality metrics are filled; runtime placeholders remain
+open.</td>
+</tr>
+<tr>
+<td>6</td>
+<td>Extract baseline numbers from SensatUrban paper</td>
+<td>Literature</td>
+<td>✅ Done</td>
+<td>Confirmed: baselines from Hu et al. 2021 Table 2 (SensatUrban).
+Table 2 restructured for clarity.</td>
+</tr>
+<tr>
+<td>7</td>
+<td>Measure runtime per tile / per scene</td>
+<td>Experiment</td>
+<td>🔴 Not done</td>
+<td><code>[TIME_INFERENCE_PER_TILE_SEC]</code>,
+<code>[TIME_PIPELINE_PER_TILE_SEC]</code>,
+<code>[TIME_PER_SCENE_MIN]</code> still pending.</td>
+</tr>
+<tr>
+<td>8</td>
+<td>Generate per-class IoU table</td>
+<td>Experiment</td>
+<td>✅ Done</td>
+<td>Per-class IoU/F1 table included (best validation epoch 45).</td>
+</tr>
+<tr>
+<td>9</td>
+<td>Create Figure 1 — pipeline block diagram</td>
+<td>Figure</td>
+<td>✅ Done</td>
+<td>figure1_pipeline.png generated via matplotlib.</td>
+</tr>
+<tr>
+<td>10</td>
+<td>Create Figure 2 — feature encoding visualization (Section 3.3)</td>
+<td>Figure</td>
+<td>✅ Done</td>
+<td>figure_feature_encoding.png generated via matplotlib.</td>
+</tr>
+<tr>
+<td>11</td>
+<td>Create Figure 3 — dataset samples (Section 4.1)</td>
+<td>Figure</td>
+<td>🟡 Partial</td>
+<td>One sample shown; extend to 3×3 panel.</td>
+</tr>
+<tr>
+<td>12</td>
+<td>Create Figure 4 — training diagnostic plots (Section 5.1.1)</td>
+<td>Figure</td>
+<td>✅ Done</td>
+<td>Loss curves, mIoU curves, confusion matrix added.</td>
+</tr>
+<tr>
+<td>13</td>
+<td>Create Figure 5 — Malta feature maps (Section 5.2)</td>
+<td>Figure</td>
+<td>🔴 Not done</td>
+<td>Placeholder only.</td>
+</tr>
+<tr>
+<td>14</td>
+<td>Create Figure 6 — building segmentation results (Section 5.2)</td>
+<td>Figure</td>
+<td>🔴 Not done</td>
+<td>Placeholder only.</td>
+</tr>
+<tr>
+<td>15b</td>
+<td>Create Figure 7 — multiclass + 3D back-projection (Section 5.2)</td>
+<td>Figure</td>
+<td>🔴 Not done</td>
+<td>Placeholder only.</td>
+</tr>
+<tr>
+<td>15</td>
+<td>Fill acknowledgements (Malta data provider, GlaDOS, funding)</td>
+<td>Admin</td>
+<td>🔴 Not done</td>
+<td>Acknowledgement placeholders still unresolved.</td>
+</tr>
+<tr>
+<td>16</td>
+<td>Verify all BibTeX metadata (pages, DOIs)</td>
+<td>References</td>
+<td>🟡 Partial</td>
+<td>KPConv and RandLA-Net citations added; some entries still need
+verification.</td>
+</tr>
+<tr>
+<td>17</td>
+<td>Confirm binary model training details</td>
+<td>Data</td>
+<td>🟡 Partial</td>
+<td>Binary metrics present; final training config needs
+confirmation.</td>
+</tr>
+<tr>
+<td>18</td>
+<td>Add KPConv and RandLA-Net original citations</td>
+<td>References</td>
+<td>✅ Done</td>
+<td><code>@thomas2019kpconv</code> and <code>@hu2020randlanet</code>
+added.</td>
+</tr>
+<tr>
+<td>19</td>
+<td>Add Duran/Atik 2022 and Wang et al. 2023 to Related Work</td>
+<td>References</td>
+<td>✅ Done</td>
+<td>Both papers added to Related Work with context sentences.</td>
+</tr>
+<tr>
+<td>20</td>
+<td>Confirm class index-to-name mapping in confusion matrix axis
+labels</td>
+<td>Figure</td>
+<td>🔴 Not done</td>
+<td>Before final submission.</td>
+</tr>
+</tbody>
+</table>
+<hr />
+<h1
+id="from-3d-lidar-to-2d-segmentation-and-back-a-practical-pipeline-for-building-footprints-and-multiclass-point-cloud-labeling">From
+3D LiDAR to 2D Segmentation and Back: A Practical Pipeline for Building
+Footprints and Multiclass Point-Cloud Labeling</h1>
+<p><strong>Saviour Formosa, PhD</strong> — Associate Professor,
+Department of Criminology, University of Malta</p>
+<p><strong>Tram Nguyen</strong> — PhD Student, Faculty of ICT,
+University of Malta</p>
+<p><strong>Dylan Seychell, PhD</strong> — Faculty Member, Faculty of
+ICT, University of Malta</p>
+<p><strong>Alexey Kozhakin</strong> — PhD Student, Faculty of ICT,
+University of Malta</p>
+<blockquote>
+<p>🔴 <strong>TODO: Confirm author order and email
+addresses</strong></p>
+</blockquote>
+<hr />
+<h2 id="abstract">Abstract</h2>
+<p>Processing large-scale 3D LiDAR point clouds for urban mapping
+remains computationally demanding and typically requires specialized 3D
+deep learning architectures. We present an end-to-end pipeline that
+converts raw LAS point clouds into compact 2D feature images via
+K-nearest-neighbor (KNN) encoding on a regular grid, applies U-Net
+segmentation with a ResNet-34 encoder for both binary building detection
+and 20-class semantic labeling, and projects pixel-level predictions
+back to the original 3D coordinates. We train on four regions from the
+STPLS3D benchmark <span class="citation"
+data-cites="chen2022stpls3dapr">[@chen2022stpls3dapr]</span> and
+demonstrate cross-domain inference on four previously unseen scenes from
+Malta (St Paul’s Bay, Xewkija, Gozo Rabat, Sliema). On the STPLS3D
+validation set, the multiclass model achieves <strong>0.2786</strong>
+mIoU, while the binary building model reaches <strong>0.8069</strong>
+IoU with end-to-end processing of
+<strong>[TIME_PIPELINE_PER_TILE_SEC]</strong> seconds per 250 m tile.
+The pipeline produces GIS-ready building footprint Shapefiles and
+classified LAS files with per-point RGB coloring, bridging the gap
+between 3D remote sensing and 2D geospatial workflows.</p>
+<blockquote>
+<p>🔴 <strong>TODO: Fill in runtime metric placeholder after running
+evaluation</strong></p>
+</blockquote>
+<hr />
+<h2 id="introduction">1. Introduction</h2>
+<p>Airborne LiDAR scanning produces dense three-dimensional point clouds
+that are increasingly central to urban mapping, infrastructure
+management, and environmental monitoring. A single survey can capture
+millions of points per square kilometer, encoding precise geometry and,
+in many sensors, per-point color information. However, the sheer volume
+and irregular structure of raw LAS files make manual interpretation
+impractical and automated processing challenging. While significant
+progress has been made in 3D deep learning — notably PointNet <span
+class="citation" data-cites="qi2017pointnet">[@qi2017pointnet]</span>,
+PointNet++ <span class="citation"
+data-cites="qi2017pointnetpp">[@qi2017pointnetpp]</span>, and DGCNN
+<span class="citation"
+data-cites="wang2019dgcnn">[@wang2019dgcnn]</span> — these architectures
+are computationally expensive for operational urban-scale datasets and
+are not directly designed to produce the vector outputs (building
+polygons, classified point clouds) that geographic information system
+(GIS) workflows require.</p>
+<p>A practical gap therefore exists between research-grade 3D
+segmentation models and the operational needs of GIS practitioners who
+work with Shapefiles, classified LAS, and standard spatial databases.
+Projection-based approaches — mapping 3D point clouds to 2D
+representations for processing by mature image segmentation networks —
+offer a promising middle ground, combining the efficiency and maturity
+of 2D convolutional architectures with the richness of 3D geospatial
+data. Yet few existing systems provide a complete, end-to-end pipeline
+from raw LAS input to GIS-ready outputs that includes both polygon
+extraction and 3D back-projection.</p>
+<p>In this work, we present such a pipeline. Given one or more LAS
+files, the system tiles the data into 250 m × 250 m blocks, encodes each
+tile into a seven-channel 2D tensor using KNN-based feature aggregation
+on a regular grid, applies U-Net segmentation, and produces either
+building footprint Shapefiles or classified 3D LAS files via
+nearest-neighbor back-projection. The approach is designed to be
+lightweight, modular, and compatible with standard GIS toolchains.</p>
+<p><strong>Our main contributions are:</strong></p>
+<ol type="1">
+<li>An end-to-end, modular pipeline from raw LAS files to GIS-ready
+building footprint polygons (ESRI Shapefiles) and semantically
+classified 3D point clouds.</li>
+<li>A KNN-based 3D-to-2D feature encoding that captures
+terrain-corrected elevation, surface normal proxies, and color
+information in a compact 512×512 tensor, enabling efficient segmentation
+with standard 2D convolutional networks.</li>
+<li>Dual segmentation models — binary building footprint detection and
+20-class semantic labeling — both using U-Net with a ResNet-34 encoder,
+trained on the STPLS3D benchmark <span class="citation"
+data-cites="chen2022stpls3dapr">[@chen2022stpls3dapr]</span>.</li>
+<li>A cross-domain demonstration: models trained on synthetic/US urban
+data (STPLS3D) are applied to four real-world scenes in Malta,
+illustrating the pipeline’s practical applicability beyond the training
+distribution.</li>
+</ol>
+<p>The remainder of this paper is organized as follows. Section 2
+reviews related work in 3D point cloud segmentation and urban LiDAR
+benchmarks. Section 3 describes the pipeline in detail. Section 4
+presents the experimental setup, and Section 5 reports quantitative and
+qualitative results. Section 6 discusses applications and limitations,
+and Section 7 concludes with directions for future work.</p>
+<hr />
+<h2 id="related-work">2. Related Work</h2>
+<p>Urban-scale 3D point cloud understanding has progressed through three
+main methodological families: point-based neural models, graph/hybrid
+deep models, and classical feature-engineered methods. The first major
+break from voxel-heavy pipelines came from PointNet, which introduced
+direct learning on unordered point sets with shared pointwise MLPs and a
+symmetric aggregation function <span class="citation"
+data-cites="qi2017pointnet">[@qi2017pointnet]</span>. This formulation
+established a simple and scalable baseline, but with limited explicit
+modeling of local neighborhoods. PointNet++ addressed this limitation by
+introducing hierarchical local feature learning through sampling,
+grouping, and recursive set abstraction <span class="citation"
+data-cites="qi2017pointnetpp">[@qi2017pointnetpp]</span>. In practice,
+this shift was important for scenes where fine-grained geometry and
+density variation matter.</p>
+<p>Graph-based deep learning further improved local geometric modeling
+by dynamically updating neighborhood structure in feature space. DGCNN
+and its EdgeConv operator model relations between nearby points across
+layers, capturing local context more explicitly than purely pointwise
+pipelines <span class="citation"
+data-cites="wang2019dgcnn">[@wang2019dgcnn]</span>. These approaches
+often improve segmentation quality on complex shapes, but they increase
+computational and memory cost due to repeated neighborhood construction.
+For large urban scenes, this trade-off remains central: richer local
+structure modeling versus practical inference efficiency. In the domain
+of urban airborne LiDAR, Wang et al. propose SMAnet, which combines
+self-attention and multi-head attention modules with multi-scale feature
+extraction on a PointNet++ backbone, achieving 85.7% overall accuracy
+and 75.1% mean F1 on the ISPRS Vaihingen benchmark <span
+class="citation" data-cites="wang2023smanet">[@wang2023smanet]</span>.
+While such point-based attention approaches achieve strong results, they
+operate directly on 3D point sets and remain computationally demanding
+at city scale.</p>
+<p>Projection-based designs such as RangeNet++ show a different
+operating point, where 3D LiDAR is mapped to a 2D representation for
+fast segmentation and then transferred back to 3D <span class="citation"
+data-cites="milioto2019rangenetpp">[@milioto2019rangenetpp]</span>.
+Follow-up studies refined this family through projection backbones with
+learnable point-wise refinement (KPRNet), architectural/runtime
+analysis, and stronger decoding modules (FIDNet), while explicitly
+reporting the accuracy-throughput trade-off <span class="citation"
+data-cites="kochanov2020kprnet triess2021scanbased li2021rethinkinglidar zhao2021fidnet">[@kochanov2020kprnet;
+@triess2021scanbased; @li2021rethinkinglidar; @zhao2021fidnet]</span>.
+Atik and Duran extend this line with SegUNet3D, an ensemble of U-Net and
+SegNet applied to spherical range images from mobile LiDAR,
+demonstrating that 2D ensemble architectures can outperform purely
+point-based methods in autonomous driving scenarios <span
+class="citation"
+data-cites="atik2022segunet3d">[@atik2022segunet3d]</span>.
+Multi-projection and point-plane formulations further reinforce this
+direction by combining multiple 2D views with 3D-aware fusion <span
+class="citation"
+data-cites="mosco2025pointplane">[@mosco2025pointplane]</span>, which is
+conceptually close to the computational motivation of our pipeline. Our
+approach follows this projection-based philosophy but targets
+aerial/airborne data: rather than spherical projection, we apply
+KNN-based grid encoding suited to the top-down acquisition geometry of
+airborne LiDAR surveys.</p>
+<p>In parallel, benchmark datasets have become a key bottleneck and
+driver of progress. The SensatUrban dataset, introduced by Hu et al. at
+CVPR 2021, provides a challenging large-scale benchmark from UK city
+photogrammetry and has been widely used to evaluate urban-scale
+segmentation performance <span class="citation"
+data-cites="hu2021stpls3d">[@hu2021stpls3d]</span>. STPLS3D provides a
+complementary synthetic-and-real aerial photogrammetry benchmark with a
+richer 20-class taxonomy, which we use for training in this work <span
+class="citation"
+data-cites="chen2022stpls3dapr">[@chen2022stpls3dapr]</span>. H3D
+(Hessigheim 3D) adds another high-resolution benchmark perspective with
+UAV LiDAR and multi-view stereo data <span class="citation"
+data-cites="kolle2021h3d">[@kolle2021h3d]</span>. Toronto-3D is widely
+used for urban roadway semantics in MLS settings <span class="citation"
+data-cites="tan2020toronto3d">[@tan2020toronto3d]</span>, while newer
+proposals such as Turin3D target adaptation under label scarcity <span
+class="citation"
+data-cites="barco2025turin3d">[@barco2025turin3d]</span>. Additional
+urban dataset contributions, including YTU3D and DublinCity, emphasize
+class diversity and city-scale coverage <span class="citation"
+data-cites="bayrak2024ytu3d zolanvari2019dublincity">[@bayrak2024ytu3d;
+@zolanvari2019dublincity]</span>.</p>
+<p>Beyond deep models, classical machine-learning pipelines remain
+relevant in operational settings where interpretability and lightweight
+deployment are prioritized. Earlier work on urban point cloud processing
+emphasized segmentation and handcrafted geometric descriptors <span
+class="citation"
+data-cites="vosselman2013pointcloudsegmentation weinmann2014semantic3dscene">[@vosselman2013pointcloudsegmentation;
+@weinmann2014semantic3dscene]</span>, and more recent Random
+Forest-based urban classification continues this practical line <span
+class="citation"
+data-cites="alfio2024randomforesturban">[@alfio2024randomforesturban]</span>.</p>
+<p>Application-specific studies also provide relevant context for our
+scope. Building-focused airborne LiDAR studies using PointNet++ variants
+demonstrate that extraction quality is strongly tied to class imbalance
+and scene characteristics <span class="citation"
+data-cites="shin2022buildingextraction">[@shin2022buildingextraction]</span>.
+Deep segmentation has also been explored in cultural heritage <span
+class="citation"
+data-cites="pierdicca2020pointcloudheritage">[@pierdicca2020pointcloudheritage]</span>,
+multimodal LiDAR-image fusion (PMNet) <span class="citation"
+data-cites="poliyapram2019pmnet">[@poliyapram2019pmnet]</span>, and
+transformer-convolution hybrids in very high-resolution urban imagery
+<span class="citation"
+data-cites="wang2021transformerconvolutionbanet">[@wang2021transformerconvolutionbanet]</span>.
+At the downstream end, semantic reconstruction pipelines such as
+Scan2LoD3 highlight how segmentation quality propagates into
+higher-level 3D building modeling tasks <span class="citation"
+data-cites="wysocki2023scan2lod3">[@wysocki2023scan2lod3]</span>.</p>
+<p>Survey and practice-oriented sources help position current work in
+this broader landscape. Recent systematic reviews summarize deep point
+cloud classification families, common datasets, and open challenges,
+including generalization across domains and computational constraints
+<span class="citation"
+data-cites="zhang2023survey3dclassification">[@zhang2023survey3dclassification]</span>.
+Benchmarking work on urban vegetation segmentation further quantifies
+generalization variance across architectures <span class="citation"
+data-cites="aditya2024benchmarkingurbanvegetation">[@aditya2024benchmarkingurbanvegetation]</span>.
+Practical 3D workflow literature also stresses that production pipelines
+must balance data quality, algorithmic complexity, and deployment
+constraints <span class="citation"
+data-cites="poux2025data3dscience">[@poux2025data3dscience]</span>.</p>
+<p>Our work is positioned in this practical gap: rather than introducing
+a new foundational 3D architecture, we focus on an end-to-end,
+deployment-oriented pipeline that maps 3D LiDAR to 2D feature space for
+efficient segmentation and then projects predictions back to 3D for
+GIS-ready outputs. This design explicitly targets urban operational use,
+where robustness, throughput, and downstream interoperability are often
+as important as raw model novelty.</p>
+<hr />
+<h2 id="method">3. Method</h2>
+<h3 id="pipeline-overview">3.1 Pipeline Overview</h3>
+<p>The proposed pipeline transforms raw LAS point clouds into two types
+of GIS-ready outputs: (a) building footprint polygons exported as ESRI
+Shapefiles, and (b) semantically classified 3D point clouds in LAS
+format with per-point class labels and RGB coloring. Processing proceeds
+through six sequential stages: spatial tiling, 3D-to-2D feature
+encoding, 2D semantic segmentation, tile stitching, and either polygon
+extraction or 3D back-projection (Figure 1).</p>
+<p>The system supports two operational modes. The <em>polygon
+generation</em> mode accepts multiple LAS files covering a large area,
+applies binary building segmentation, stitches per-tile predictions into
+a seamless mosaic, extracts building contours, and exports them as
+Shapefiles. The <em>3D classification</em> mode processes a single LAS
+file through the 20-class segmentation model and maps pixel-level
+predictions back to the original 3D points, producing a classified LAS
+file suitable for visualization in CloudCompare, PDAL, or commercial
+LiDAR viewers.</p>
+<figure>
+<img src="../figures/figure1_pipeline.png"
+alt="Figure 1. Pipeline overview" />
+<figcaption aria-hidden="true">Figure 1. Pipeline overview</figcaption>
+</figure>
+<p><em>Figure 1. Overview of the proposed pipeline. Raw LAS files are
+tiled into 250 m blocks, encoded into seven-channel 2D tensors via KNN
+aggregation, segmented by a U-Net model, and post-processed into either
+building footprint Shapefiles (polygon mode) or classified 3D LAS files
+(3D classification mode).</em></p>
+<h3 id="data-preprocessing-and-tiling">3.2 Data Preprocessing and
+Tiling</h3>
+<p>The pipeline accepts LAS files (versions 1.0–1.4) containing
+per-point attributes: <em>x</em>, <em>y</em>, <em>z</em> coordinates,
+RGB color channels, and optionally a classification label. Each file is
+spatially partitioned into square tiles of 250 m × 250 m using
+coordinate-based slicing. Tile boundaries are determined by the point
+cloud extent, and each tile is saved as an independent LAS file.</p>
+<p>Within each tile, the point set is standardized to a fixed
+cardinality of <em>N</em> = 30,000 points. If the tile contains more
+than <em>N</em> points, random subsampling without replacement is
+applied; if fewer, resampling with replacement is used to reach the
+target count. This guarantees a fixed-size input to the subsequent
+feature encoding stage regardless of the original point density.</p>
+<p>Coordinates are then normalized per tile: each axis is shifted so
+that the minimum value becomes zero (<em>x′ = x − x_min</em>, <em>y′ = y
+− y_min</em>, <em>z′ = z − z_min</em>), and the horizontal axes are
+scaled to the unit interval for grid mapping. RGB values are normalized
+by dividing by the product of the global color range and 256, mapping
+them to [0, 1].</p>
+<h3 id="d-to-2d-feature-encoding">3.3 3D-to-2D Feature Encoding</h3>
+<p>The core of the pipeline is a KNN-based projection that maps each
+tile’s 3D point cloud onto a regular 2D grid, producing a dense
+multi-channel tensor suitable for convolutional processing.</p>
+<p>A uniform grid of size <em>M × M</em> = 512 × 512 is constructed over
+the tile’s normalized <em>xy</em>-extent using linearly spaced
+coordinates. For each of the <em>M²</em> grid cells, the <em>K</em> = 4
+nearest points in the tile are identified using a KD-tree (specifically,
+<code>scipy.spatial.cKDTree</code>) built on the 2D
+<em>xy</em>-coordinates of the <em>N</em> sampled points. This produces
+an intermediate tensor of shape (<em>M</em>, <em>M</em>, <em>K</em>, 7),
+where the seven attributes per neighbor are (<em>x</em>, <em>y</em>,
+<em>z</em>, <em>r</em>, <em>g</em>, <em>b</em>, class).</p>
+<p>Seven output feature channels are then computed by aggregating over
+the <em>K</em> neighbors:</p>
+<ol type="1">
+<li><p><strong>Terrain-corrected elevation (<em>z_mean</em>)</strong>:
+The mean <em>z</em>-coordinate over <em>K</em> neighbors is computed for
+each grid cell, yielding a raw elevation map of shape (<em>M</em>,
+<em>M</em>). A large-kernel 2D uniform filter (window size = <em>M</em>
+= 512, reflect padding) is applied to obtain a smooth terrain profile,
+which is then subtracted from the raw elevation: <em>z_adj = z_mean −
+z_smooth</em>. The result is shifted to be non-negative. This profile
+correction removes large-scale terrain variation and highlights local
+above-ground features such as buildings and vegetation.</p></li>
+<li><p><strong>Vertical normal proxy (<em>n_z</em>)</strong>: The
+standard deviations of <em>x</em>, <em>y</em>, and <em>z</em> over the
+<em>K</em> neighbors (<em>σ_x</em>, <em>σ_y</em>, <em>σ_z</em>) serve as
+a proxy for local surface orientation. The vertical component is
+computed as:</p>
+<p><span class="math display">\[n_z = \frac{\sigma_z}{\sqrt{\sigma_x^2 +
+\sigma_y^2 + \sigma_z^2}}\]</span></p>
+<p>Flat horizontal surfaces (ground, rooftops) produce high <em>n_z</em>
+values, while vertical surfaces (walls, tree trunks) produce low
+values.</p></li>
+<li><p><strong>Radial normal proxy (<em>n_r</em>)</strong>: The
+complementary horizontal component:</p>
+<p><span class="math display">\[n_r = \frac{\sqrt{\sigma_x^2 +
+\sigma_y^2}}{\sqrt{\sigma_x^2 + \sigma_y^2 +
+\sigma_z^2}}\]</span></p></li>
+<li><p><strong>Color channels (<em>r</em>, <em>g</em>,
+<em>b</em>)</strong>: The mean of each normalized color channel over the
+<em>K</em> neighbors.</p></li>
+<li><p><strong>Classification label (class)</strong>: The classification
+value of the nearest neighbor (index 0). This channel is used as the
+ground-truth segmentation mask during training and is not available at
+inference time on unlabeled data.</p></li>
+</ol>
+<p>The output is a seven-channel tensor of shape (512, 512, 7). For
+model input, the first three feature channels — <em>z_mean</em>,
+<em>n_z</em>, and <em>n_r</em> — are normalized to [0, 255] and composed
+into a three-channel image, which visually resembles a false-color
+aerial view where elevation, surface flatness, and surface roughness are
+encoded as RGB. This representation allows the use of standard
+ImageNet-pretrained encoders without architectural modification.</p>
+<figure>
+<img src="../figures/figure_feature_encoding.png"
+alt="Figure 2. Feature encoding" />
+<figcaption aria-hidden="true">Figure 2. Feature encoding</figcaption>
+</figure>
+<p><em>Figure 2. 3D-to-2D feature encoding for a single 250 m tile
+(Memphis_500_250, STPLS3D test set). (a) RGB projection of the input
+point cloud. Individual feature channels extracted by KNN aggregation:
+terrain-corrected elevation (<span
+class="math inline">\(z_\mathrm{mean}\)</span>, b), vertical normal
+proxy (<span class="math inline">\(n_z\)</span>, c), and radial normal
+proxy (<span class="math inline">\(n_r\)</span>, d), each shown in
+grayscale. (e) Three-channel feature image composed from (b–d), used as
+input to the U-Net model. (f) Ground-truth semantic mask used during
+training.</em></p>
+<h3 id="d-segmentation-models">3.4 2D Segmentation Models</h3>
+<p>Both segmentation tasks use a U-Net architecture <span
+class="citation"
+data-cites="ronneberger2015unet">[@ronneberger2015unet]</span> with a
+ResNet-34 encoder, implemented via the
+<code>segmentation-models-pytorch</code> library. The encoder is
+initialized with ImageNet-pretrained weights. The decoder follows the
+standard U-Net design with skip connections from each encoder stage. The
+model receives three-channel input images of size 512 × 512 and produces
+dense per-pixel logits.</p>
+<p>Two model variants are trained:</p>
+<ul>
+<li><strong>Binary building model</strong>: 2 output classes (building
+vs. background). The predicted class map is obtained via argmax over the
+output logits.</li>
+<li><strong>Multiclass model</strong>: 20 output classes corresponding
+to the STPLS3D semantic taxonomy <span class="citation"
+data-cites="chen2022stpls3dapr">[@chen2022stpls3dapr]</span>. Each
+predicted class index is mapped to a unique RGB color for
+visualization.</li>
+</ul>
+<p>At inference time, images are processed in batches of 8. For the
+binary model, the output is a grayscale mask scaled to [0, 255]. For the
+multiclass model, the argmax class index at each pixel is converted to
+an RGB image using a fixed color lookup table.</p>
+<h3 id="post-processing-and-polygon-generation">3.5 Post-processing and
+Polygon Generation</h3>
+<p>In the polygon generation mode, per-tile prediction masks are
+reassembled into a seamless mosaic. Each tile’s spatial position is
+determined by parsing the <em>xy</em>-coordinates encoded in its
+filename. The output image dimensions are computed from the tile grid
+extents, and each tile’s prediction is placed at the corresponding
+position; missing tiles are filled with black pixels.</p>
+<p>Building footprint polygons are then extracted from the stitched
+binary mask. The mask is binarized with a threshold of 127 and inverted.
+External contours are detected using OpenCV’s <code>findContours</code>
+with <code>RETR_EXTERNAL</code> retrieval mode and
+<code>CHAIN_APPROX_SIMPLE</code> approximation. Contours with an area
+below <em>A_min</em> = 500 pixels are discarded as noise. The remaining
+contours are exported as polygon geometries to an ESRI Shapefile (SHP,
+DBF, SHX) using the <code>pyshp</code> library, with a <em>y</em>-axis
+flip to convert from image coordinates to geographic conventions.</p>
+<h3 id="d-back-projection">3.6 3D Back-Projection</h3>
+<p>In the 3D classification mode, pixel-level predictions are
+transferred back to the original point cloud via nearest-neighbor
+interpolation. Both the LAS point coordinates (<em>x</em>, <em>y</em>)
+and the prediction image pixel coordinates are normalized to [0, 1]. A
+<code>NearestNDInterpolator</code> (from <code>scipy.interpolate</code>)
+is constructed on the flattened image grid coordinates with their
+predicted RGB values. For each point in the original LAS file, the
+interpolator returns the RGB color of the nearest image pixel.</p>
+<p>The predicted RGB triplet is then mapped to a semantic class index
+via a reverse color-to-class dictionary. The output LAS file retains the
+original (<em>x</em>, <em>y</em>, <em>z</em>) coordinates and is
+augmented with a classification field containing the predicted class
+label and, optionally, per-point RGB channels set to the predicted color
+(scaled to 16-bit). This enables direct visualization of the
+segmentation result in any LAS-compatible viewer.</p>
+<hr />
+<h2 id="experiments">4. Experiments</h2>
+<h3 id="datasets">4.1 Datasets</h3>
+<p><strong>STPLS3D (training and validation).</strong> We use the
+Semantic Terrain Point Labeling — Synthetic 3D (STPLS3D) benchmark <span
+class="citation"
+data-cites="chen2022stpls3dapr">[@chen2022stpls3dapr]</span> as our
+training data source. Four urban regions are selected: OCCC, RA, USC,
+and WMSC, each provided as a single LAS file of approximately 170 MB.
+Each region covers roughly 1 km² of urban terrain with dense point cloud
+coverage and per-point semantic labels. The regions are tiled into 250 m
+× 250 m blocks following the preprocessing procedure described in
+Section 3.2. The prepared split contains <strong>230 training
+samples</strong>, <strong>50 validation samples</strong>, and <strong>42
+test samples</strong> (total <strong>322</strong>), with aligned
+<code>img_features</code>, <code>img_rgb</code>, <code>img_class</code>,
+and <code>tensors</code> artifacts for each sample.</p>
+<p><strong>Malta (inference only).</strong> To evaluate cross-domain
+applicability, we apply the trained models to four scenes from Malta’s
+national LiDAR survey: St Paul’s Bay, Xewkija, Gozo Rabat, and Sliema.
+These scenes represent diverse Mediterranean urban morphologies — dense
+historic centers, suburban areas, and coastal developments.
+<strong>[DATA_MALTA_DESC]</strong> 🔴 <em>TODO: Add Malta dataset
+details (file sizes, point counts, coordinate system)</em>. No
+ground-truth labels are available for the Malta scenes; evaluation is
+therefore qualitative.</p>
+<p><strong>Class taxonomy.</strong> The STPLS3D benchmark defines a
+semantic taxonomy that we adopt for the multiclass model. Table 1 lists
+the class identifiers and their semantic labels. The binary building
+model collapses this taxonomy into two classes: building and
+non-building.</p>
+<p><strong>Table 1.</strong> STPLS3D semantic class taxonomy used in
+this work.</p>
+<table>
+<thead>
+<tr>
+<th>ID</th>
+<th>Class Name</th>
+<th>ID</th>
+<th>Class Name</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>0</td>
+<td>Ground</td>
+<td>10</td>
+<td>Motorcycle</td>
+</tr>
+<tr>
+<td>1</td>
+<td>Building</td>
+<td>11</td>
+<td>Light Pole</td>
+</tr>
+<tr>
+<td>2</td>
+<td>Low Vegetation</td>
+<td>12</td>
+<td>Street Sign</td>
+</tr>
+<tr>
+<td>3</td>
+<td>Medium Vegetation</td>
+<td>13</td>
+<td>Clutter</td>
+</tr>
+<tr>
+<td>4</td>
+<td>High Vegetation</td>
+<td>14</td>
+<td>Fence</td>
+</tr>
+<tr>
+<td>5</td>
+<td>Vehicle</td>
+<td>15</td>
+<td>Road</td>
+</tr>
+<tr>
+<td>6</td>
+<td>Truck</td>
+<td>16</td>
+<td>Unassigned</td>
+</tr>
+<tr>
+<td>7</td>
+<td>Aircraft</td>
+<td>17</td>
+<td>Windows</td>
+</tr>
+<tr>
+<td>8</td>
+<td>Military Vehicle</td>
+<td>18</td>
+<td>Dirt</td>
+</tr>
+<tr>
+<td>9</td>
+<td>Bike</td>
+<td>19</td>
+<td>Grass</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Dataset sample visualization.</strong> Figure 2 presents
+representative samples from the train/validation/test splits. Each
+sample includes three aligned images: <code>img_rgb</code> (colorized
+point projection), <code>img_features</code> (engineered channels used
+for training input), and <code>img_class</code> (ground-truth semantic
+mask).</p>
+<figure>
+<img src="../figures/figure3_dataset_samples.png"
+alt="Figure 3. Dataset samples" />
+<figcaption aria-hidden="true">Figure 3. Dataset samples</figcaption>
+</figure>
+<p><em>Figure 3. Representative samples from the train, validation, and
+test splits of the prepared STPLS3D dataset. Each row shows one 250 m
+tile from a different city: Austin (train), Fort Worth (val), San
+Francisco (test). Columns left to right: 3D point-cloud visualization in
+CloudCompare (placeholder — to be replaced), RGB projection
+(<code>img_rgb</code>), KNN-encoded feature image
+(<code>img_features</code>), and semantic ground-truth mask
+(<code>img_class</code>).</em></p>
+<blockquote>
+<p>🟡 <strong>TODO:</strong> Replace CloudCompare placeholder column
+with actual screenshots for Austin_250_250, FortWorth_250_250,
+SanFrancisco_500_500.</p>
+</blockquote>
+<h3 id="training-protocol">4.2 Training Protocol</h3>
+<p>Both models use the U-Net architecture with a ResNet-34 encoder as
+described in Section 3.4. The multiclass model is trained for 100 epochs
+with a batch size of 8. We use the Adam optimizer with a learning rate
+of 10⁻³ and default momentum parameters (β₁ = 0.9, β₂ = 0.999). The loss
+function is the multiclass Dice loss, implemented via
+<code>segmentation-models-pytorch</code>
+(<code>smp.losses.DiceLoss</code> with <code>mode="multiclass"</code>).
+No data augmentation is applied beyond conversion to tensors
+(<code>ToTensor</code>).</p>
+<p>The binary building model uses the same U-Net–ResNet-34 architecture
+with 2 output classes. Training details for the binary model are
+analogous; the best checkpoint is selected at <strong>epoch 25</strong>.
+The multiclass model checkpoint is selected at <strong>epoch
+45</strong>, corresponding to the best validation mIoU across all
+training runs.</p>
+<p>Model checkpoints are saved after every epoch. Training was performed
+on <strong>NVIDIA Tesla T4 (CUDA 13.0, Driver 580.82.07)</strong> with
+<strong>12.7</strong> GB of RAM (<strong>x86_64</strong> CPU
+architecture).</p>
+<h3 id="evaluation-metrics">4.3 Evaluation Metrics</h3>
+<p>We evaluate segmentation quality using four standard metrics computed
+per class from the confusion matrix:</p>
+<ul>
+<li><strong>Precision</strong>: Prec = TP / (TP + FP)</li>
+<li><strong>Recall</strong>: Rec = TP / (TP + FN)</li>
+<li><strong>Intersection over Union</strong>: IoU = TP / (TP + FP +
+FN)</li>
+<li><strong>F1 Score</strong>: F1 = 2 · Prec · Rec / (Prec + Rec)</li>
+</ul>
+<p>For the multiclass model, we report the mean IoU (mIoU) averaged
+across all classes. For the binary building model, we report the
+building-class IoU, F1 score, precision, and recall.</p>
+<h3 id="baselines">4.4 Baselines</h3>
+<p>To contextualize our results, we report representative baseline
+numbers from the SensatUrban benchmark (Hu et al. <span class="citation"
+data-cites="hu2021stpls3d">[@hu2021stpls3d]</span>, Table 2), where mIoU
+and class-wise IoU are explicitly published for several well-known
+models. We emphasize that this comparison is <strong>not directly
+equivalent</strong>: those baseline numbers are evaluated on SensatUrban
+(UK city photogrammetry, 13 classes), while our pipeline is trained and
+evaluated on STPLS3D (US urban synthetic data, 20 classes) with a
+project-specific split. The comparison is intended to provide a sense of
+metric scale relative to established methods, not to claim architectural
+superiority. Our contribution lies in the complete end-to-end pipeline
+from raw LAS to GIS-ready outputs, rather than in the segmentation
+backbone itself.</p>
+<hr />
+<h2 id="results">5. Results</h2>
+<h3 id="quantitative-results">5.1 Quantitative Results</h3>
+<p>Table 2 summarizes the segmentation performance of our pipeline on
+the STPLS3D validation set. For contextual reference, published results
+of well-known methods on the SensatUrban benchmark are also included;
+these are drawn from Table 2 in Hu et al. <span class="citation"
+data-cites="hu2021stpls3d">[@hu2021stpls3d]</span> and are evaluated on
+a different benchmark and class taxonomy, so row-to-row comparison
+should be interpreted with caution (see Section 4.4).</p>
+<p><strong>Table 2.</strong> Segmentation results. Upper section:
+contextual reference values from SensatUrban benchmark (Hu et al. <span
+class="citation" data-cites="hu2021stpls3d">[@hu2021stpls3d]</span>).
+Lower section: our pipeline evaluated on STPLS3D validation set.
+Benchmarks differ in dataset, class taxonomy, and split — comparison is
+indicative only.</p>
+<table>
+<colgroup>
+<col style="width: 12%" />
+<col style="width: 16%" />
+<col style="width: 15%" />
+<col style="width: 9%" />
+<col style="width: 21%" />
+<col style="width: 7%" />
+<col style="width: 18%" />
+</colgroup>
+<thead>
+<tr>
+<th>Method</th>
+<th>Benchmark</th>
+<th>Approach</th>
+<th>mIoU</th>
+<th>Building IoU</th>
+<th>F1</th>
+<th>Prec / Rec</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>PointNet <span class="citation"
+data-cites="qi2017pointnet">[@qi2017pointnet]</span></td>
+<td>SensatUrban</td>
+<td>3D direct</td>
+<td>0.2371</td>
+<td>0.8005</td>
+<td>—</td>
+<td>—</td>
+</tr>
+<tr>
+<td>PointNet++ <span class="citation"
+data-cites="qi2017pointnetpp">[@qi2017pointnetpp]</span></td>
+<td>SensatUrban</td>
+<td>3D direct</td>
+<td>0.3292</td>
+<td>0.8477</td>
+<td>—</td>
+<td>—</td>
+</tr>
+<tr>
+<td>RandLA-Net <span class="citation"
+data-cites="hu2020randlanet">[@hu2020randlanet]</span></td>
+<td>SensatUrban</td>
+<td>3D direct</td>
+<td>0.5269</td>
+<td>0.9158</td>
+<td>—</td>
+<td>—</td>
+</tr>
+<tr>
+<td>KPConv <span class="citation"
+data-cites="thomas2019kpconv">[@thomas2019kpconv]</span></td>
+<td>SensatUrban</td>
+<td>3D direct</td>
+<td>0.5758</td>
+<td>0.9533</td>
+<td>—</td>
+<td>—</td>
+</tr>
+<tr>
+<td><strong>Ours (Multiclass)</strong></td>
+<td><strong>STPLS3D</strong></td>
+<td><strong>3D→2D→3D</strong></td>
+<td><strong>0.2786</strong></td>
+<td><strong>0.8069</strong></td>
+<td>—</td>
+<td>—</td>
+</tr>
+<tr>
+<td><strong>Ours (Binary)</strong></td>
+<td><strong>STPLS3D</strong></td>
+<td><strong>3D→2D→3D</strong></td>
+<td>—</td>
+<td><strong>0.8069</strong></td>
+<td><strong>0.8931</strong></td>
+<td><strong>0.9019 / 0.8845</strong></td>
+</tr>
+</tbody>
+</table>
+<p>Table 3 reports the processing time at each pipeline stage.</p>
+<p><strong>Table 3.</strong> Runtime performance of the pipeline. All
+times are measured on <strong>x86_64</strong> / <strong>NVIDIA Tesla T4
+(CUDA 13.0, Driver 580.82.07)</strong>.</p>
+<table>
+<colgroup>
+<col style="width: 12%" />
+<col style="width: 26%" />
+<col style="width: 28%" />
+<col style="width: 32%" />
+</colgroup>
+<thead>
+<tr>
+<th>Scenario</th>
+<th>Inference / tile (s)</th>
+<th>End-to-end / tile (s)</th>
+<th>End-to-end / scene (min)</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Ours</td>
+<td><strong>[TIME_INFERENCE_PER_TILE_SEC]</strong></td>
+<td><strong>[TIME_PIPELINE_PER_TILE_SEC]</strong></td>
+<td><strong>[TIME_PER_SCENE_MIN]</strong></td>
+</tr>
+</tbody>
+</table>
+<blockquote>
+<p>🔴 <strong>TODO: Measure runtime</strong> — benchmark each pipeline
+stage on target hardware</p>
+</blockquote>
+<p>A per-class IoU breakdown for the multiclass model is provided in
+Table 4.</p>
+<p><strong>Table 4.</strong> Per-class IoU on the STPLS3D validation set
+(multiclass model, best checkpoint at epoch 45).</p>
+<table>
+<thead>
+<tr>
+<th style="text-align: right;">Class ID</th>
+<th>Class Name</th>
+<th style="text-align: right;">IoU</th>
+<th style="text-align: right;">F1</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align: right;">0</td>
+<td>Ground</td>
+<td style="text-align: right;">0.6439</td>
+<td style="text-align: right;">0.7834</td>
+</tr>
+<tr>
+<td style="text-align: right;">1</td>
+<td>Building</td>
+<td style="text-align: right;">0.8069</td>
+<td style="text-align: right;">0.8931</td>
+</tr>
+<tr>
+<td style="text-align: right;">2</td>
+<td>Low Vegetation</td>
+<td style="text-align: right;">0.7920</td>
+<td style="text-align: right;">0.8839</td>
+</tr>
+<tr>
+<td style="text-align: right;">3</td>
+<td>Medium Vegetation</td>
+<td style="text-align: right;">0.1599</td>
+<td style="text-align: right;">0.2757</td>
+</tr>
+<tr>
+<td style="text-align: right;">4</td>
+<td>High Vegetation</td>
+<td style="text-align: right;">0.6658</td>
+<td style="text-align: right;">0.7993</td>
+</tr>
+<tr>
+<td style="text-align: right;">5</td>
+<td>Vehicle</td>
+<td style="text-align: right;">0.2587</td>
+<td style="text-align: right;">0.4111</td>
+</tr>
+<tr>
+<td style="text-align: right;">6</td>
+<td>Truck</td>
+<td style="text-align: right;">0.2258</td>
+<td style="text-align: right;">0.3684</td>
+</tr>
+<tr>
+<td style="text-align: right;">7</td>
+<td>Aircraft</td>
+<td style="text-align: right;">0.0600</td>
+<td style="text-align: right;">0.1132</td>
+</tr>
+<tr>
+<td style="text-align: right;">8</td>
+<td>Military Vehicle</td>
+<td style="text-align: right;">0.0696</td>
+<td style="text-align: right;">0.1301</td>
+</tr>
+<tr>
+<td style="text-align: right;">9</td>
+<td>Bike</td>
+<td style="text-align: right;">0.0192</td>
+<td style="text-align: right;">0.0378</td>
+</tr>
+<tr>
+<td style="text-align: right;">10</td>
+<td>Motorcycle</td>
+<td style="text-align: right;">0.0519</td>
+<td style="text-align: right;">0.0986</td>
+</tr>
+<tr>
+<td style="text-align: right;">11</td>
+<td>Light Pole</td>
+<td style="text-align: right;">0.2482</td>
+<td style="text-align: right;">0.3977</td>
+</tr>
+<tr>
+<td style="text-align: right;">12</td>
+<td>Street Sign</td>
+<td style="text-align: right;">0.0880</td>
+<td style="text-align: right;">0.1617</td>
+</tr>
+<tr>
+<td style="text-align: right;">13</td>
+<td>Clutter</td>
+<td style="text-align: right;">0.1181</td>
+<td style="text-align: right;">0.2113</td>
+</tr>
+<tr>
+<td style="text-align: right;">14</td>
+<td>Fence</td>
+<td style="text-align: right;">0.2715</td>
+<td style="text-align: right;">0.4271</td>
+</tr>
+<tr>
+<td style="text-align: right;">15</td>
+<td>Road</td>
+<td style="text-align: right;">0.3196</td>
+<td style="text-align: right;">0.4844</td>
+</tr>
+<tr>
+<td style="text-align: right;">16</td>
+<td>Unassigned</td>
+<td style="text-align: right;">0.0000</td>
+<td style="text-align: right;">0.0000</td>
+</tr>
+<tr>
+<td style="text-align: right;">17</td>
+<td>Windows</td>
+<td style="text-align: right;">0.0805</td>
+<td style="text-align: right;">0.1490</td>
+</tr>
+<tr>
+<td style="text-align: right;">18</td>
+<td>Dirt</td>
+<td style="text-align: right;">0.2571</td>
+<td style="text-align: right;">0.4091</td>
+</tr>
+<tr>
+<td style="text-align: right;">19</td>
+<td>Grass</td>
+<td style="text-align: right;">0.4353</td>
+<td style="text-align: right;">0.6066</td>
+</tr>
+</tbody>
+</table>
+<h3 id="training-diagnostics-curves-and-confusion-matrices">5.1.1
+Training Diagnostics (Curves and Confusion Matrices)</h3>
+<p>Figure 3 shows the training dynamics and final confusion matrices
+generated during model training.</p>
+<p><img src="../result/raw/loss_curves.png"
+alt="Loss curves (train/val)" /> <em>Figure 4(a). Loss curves on
+training and validation sets.</em></p>
+<p><img src="../result/raw/miou_curves.png"
+alt="mIoU curves (train/val)" /> <em>Figure 4(b). mIoU curves on
+training and validation sets.</em></p>
+<p><img src="../result/raw/confusion_matrix_val_final.png"
+alt="Validation confusion matrix" /> <em>Figure 4(c). Final confusion
+matrix on the validation split.</em></p>
+<blockquote>
+<p>🔴 <strong>TODO:</strong> Confirm class index-to-name mapping in the
+confusion matrix axis labels before final submission.</p>
+</blockquote>
+<h3 id="qualitative-results">5.2 Qualitative Results</h3>
+<p><strong>Feature visualization.</strong> Figure 5 shows the
+three-channel feature images generated by the KNN encoding for three
+Malta scenes. The terrain-corrected elevation channel (<em>z_mean</em>)
+clearly delineates buildings and vegetation from ground level. The
+vertical normal proxy (<em>n_z</em>) highlights flat surfaces such as
+rooftops and roads, while the radial component (<em>n_r</em>) responds
+to vertical structures and vegetation edges. Together, these channels
+provide a rich representation that captures both geometric and
+structural information from the point cloud.</p>
+<blockquote>
+<p>🔴 <strong>TODO — Figure 5:</strong> Generate feature map images for
+Malta scenes by running the pipeline preprocessing stages.</p>
+<p><code>(a) St Paul's Bay    (b) Xewkija    (c) Gozo Rabat</code></p>
+<p><em>Caption: Three-channel feature images for three Malta scenes.
+Each image encodes terrain-corrected elevation (z_mean, red), vertical
+normal proxy (n_z, green), and radial normal proxy (n_r, blue).</em></p>
+</blockquote>
+<p><strong>Building segmentation.</strong> Figure 6 presents the binary
+building segmentation results on Malta scenes. Despite being trained
+exclusively on STPLS3D (US urban data), the model successfully detects
+building footprints in the Mediterranean urban fabric of Malta,
+including dense historic centers with irregular building shapes. The
+extracted polygons correspond well to visible building outlines, though
+some fragmentation occurs in areas with complex roof geometry.</p>
+<blockquote>
+<p>🔴 <strong>TODO — Figure 6:</strong> Generate building segmentation
+result images from Malta scenes.</p>
+<p><code>Feature image → Predicted mask → Extracted polygons</code></p>
+<p><em>Caption: Binary building segmentation on Malta scenes.</em></p>
+</blockquote>
+<p><strong>Multiclass segmentation and 3D back-projection.</strong>
+Figure 7 shows the multiclass segmentation output and the corresponding
+3D back-projection for a representative Malta scene. The 20-class model
+assigns semantically meaningful labels to the majority of the scene,
+distinguishing buildings, vegetation types, roads, and ground. The 3D
+back-projection preserves the spatial structure of the original point
+cloud while adding per-point class labels and RGB coloring, enabling
+direct inspection in standard LAS viewers.</p>
+<blockquote>
+<p>🔴 <strong>TODO — Figure 7:</strong> Generate multiclass segmentation
++ 3D back-projection screenshots (Sliema).</p>
+<p><code>(a) Multiclass prediction    (b) Original point cloud    (c) Classified point cloud</code></p>
+<p><em>Caption: Multiclass segmentation and 3D back-projection for
+Sliema, Malta.</em></p>
+</blockquote>
+<hr />
+<h2 id="discussion">6. Discussion</h2>
+<h3 id="applications">6.1 Applications</h3>
+<p>The pipeline produces outputs in standard geospatial formats that
+integrate directly into existing GIS workflows. Building footprint
+Shapefiles can be loaded into QGIS, ArcGIS, or any OGC-compliant system
+for area estimation, density analysis, cadastral mapping, and urban
+change detection. The classified LAS output supports 3D visualization
+and analysis in tools such as CloudCompare, PDAL, and commercial LiDAR
+software suites. The modular design allows individual pipeline stages to
+be replaced or extended — for example, substituting the U-Net model with
+a more specialized architecture or adding a polygon regularization
+step.</p>
+<p>The cross-domain demonstration on Malta is particularly relevant for
+national spatial data infrastructure (NSDI) development in small-island
+developing states, where labeled training data is scarce but national
+LiDAR surveys are increasingly available. The pipeline enables rapid
+generation of building inventories and land cover maps from existing
+LiDAR archives, supporting urban planning, environmental monitoring,
+disaster risk assessment, and archaeological survey. The dual output
+modes — 2D vector polygons for planimetric analysis and 3D classified
+point clouds for volumetric inspection — address complementary needs in
+these application domains.</p>
+<h3 id="limitations">6.2 Limitations</h3>
+<p>The 3D-to-2D projection inherently collapses vertical structure:
+stacked elements, overhanging features (balconies, bridges), and complex
+multi-level buildings are poorly represented in the projected tensor.
+The KNN encoding with <em>K</em> = 4 provides only a coarse
+approximation of surface normals; increasing <em>K</em> would improve
+smoothness but also increase computational cost. The fixed grid
+resolution of 512 × 512 over 250 m tiles yields a ground sampling
+distance of approximately 0.49 m/pixel, which limits the detection of
+features smaller than roughly 1 m.</p>
+<p>From a training perspective, only four STPLS3D regions were used,
+which limits class diversity and geographic variability in the training
+set. The 80/20 random split at the tile level does not guarantee
+scene-level independence, and some spatial autocorrelation between
+training and validation tiles is possible. No domain adaptation
+technique is applied for the Malta inference, and no ground-truth labels
+are available for the Malta scenes, preventing quantitative cross-domain
+evaluation. The polygon extraction relies on simple contour detection
+with area filtering and does not regularize building shapes (e.g.,
+enforcing right angles or smooth outlines), which may limit accuracy for
+cadastral-grade applications.</p>
+<hr />
+<h2 id="conclusion-and-future-work">7. Conclusion and Future Work</h2>
+<p>We have presented an end-to-end pipeline for processing airborne
+LiDAR point clouds that bridges 3D remote sensing and 2D GIS workflows.
+The system converts raw LAS files into compact feature tensors via
+KNN-based 3D-to-2D encoding, applies U-Net segmentation for both binary
+building detection and 20-class semantic labeling, and produces
+GIS-ready outputs — building footprint Shapefiles and classified 3D LAS
+files — without requiring specialized 3D deep learning architectures.
+Trained on four STPLS3D regions <span class="citation"
+data-cites="chen2022stpls3dapr">[@chen2022stpls3dapr]</span>, the
+pipeline achieves <strong>0.2786</strong> mIoU on the validation set and
+processes each 250 m tile in
+<strong>[TIME_PIPELINE_PER_TILE_SEC]</strong> seconds end-to-end. 🔴
+<em>TODO: Fill runtime metric.</em> Cross-domain application to four
+Malta scenes demonstrates qualitatively convincing results, suggesting
+practical applicability beyond the training distribution.</p>
+<p>Several directions remain for future work. First, incorporating data
+augmentation (geometric transforms, color jitter) and learning rate
+scheduling could improve model generalization, particularly for
+cross-domain transfer. Second, exploring larger encoder backbones
+(ResNet-50, EfficientNet) or alternative decoder architectures
+(DeepLabV3+, Feature Pyramid Networks) may yield better segmentation
+accuracy. Third, systematic ablation studies on the encoding parameters
+— <em>K</em>, grid size <em>M</em>, smoothing window, and point sampling
+limit — would help identify optimal configurations for different scene
+types and point densities. Fourth, replacing the 2D-projected training
+with end-to-end 3D supervision (e.g., point-level loss functions) could
+mitigate the information loss inherent in the projection step. Fifth,
+evaluation on additional benchmarks and sensor modalities (terrestrial
+laser scanning, mobile mapping) would establish broader applicability.
+Finally, post-processing refinements such as Douglas–Peucker
+simplification or alpha-shape fitting for polygon regularization could
+improve the quality of building footprints for cadastral
+applications.</p>
+<hr />
+<h2 id="acknowledgements">Acknowledgements</h2>
+<p>The authors thank <strong>[ACK_MALTA_DATA_PROVIDER]</strong> for
+providing the Malta LiDAR data and the creators of the STPLS3D benchmark
+<span class="citation"
+data-cites="chen2022stpls3dapr">[@chen2022stpls3dapr]</span> for making
+their dataset publicly available. Computational resources were provided
+by <strong>[ACK_GLADOS_RESOURCE]</strong>. This work was supported by
+the University of Malta.</p>
+<blockquote>
+<p>🔴 <strong>TODO: Fill acknowledgements</strong> — Malta data provider
+name, GlaDOS allocation details, funding sources/grant numbers</p>
+</blockquote>
+<hr />
+<h2 id="references">References</h2>
+<p>References are managed via BibTeX in
+<code>paper_arxiv/refs.bib</code> and should be rendered automatically
+during build (Pandoc citeproc or LaTeX/BibTeX workflow).</p>
+<h3 id="temporary-manual-list-for-markdown-reading">Temporary Manual
+List (for Markdown reading)</h3>
+<ol type="1">
+<li><span class="citation"
+data-cites="vosselman2013pointcloudsegmentation">[@vosselman2013pointcloudsegmentation]</span>
+Vosselman et al. <em>Point Cloud Segmentation for Urban Scene
+Classification</em>. ISPRS Archives, 2013.</li>
+<li><span class="citation"
+data-cites="weinmann2014semantic3dscene">[@weinmann2014semantic3dscene]</span>
+Weinmann et al. <em>Semantic 3D Scene Interpretation: A Framework
+Combining Optimal Neighborhood Size Selection with Relevant
+Features</em>. ISPRS Annals, 2014.</li>
+<li><span class="citation"
+data-cites="ronneberger2015unet">[@ronneberger2015unet]</span>
+Ronneberger et al. <em>U-Net: Convolutional Networks for Biomedical
+Image Segmentation</em>. MICCAI, 2015.</li>
+<li><span class="citation"
+data-cites="qi2017pointnet">[@qi2017pointnet]</span> Qi et
+al. <em>PointNet: Deep Learning on Point Sets for 3D Classification and
+Segmentation</em>. CVPR, 2017.</li>
+<li><span class="citation"
+data-cites="qi2017pointnetpp">[@qi2017pointnetpp]</span> Qi et
+al. <em>PointNet++: Deep Hierarchical Feature Learning on Point Sets in
+a Metric Space</em>. NeurIPS, 2017.</li>
+<li><span class="citation"
+data-cites="milioto2019rangenetpp">[@milioto2019rangenetpp]</span>
+Milioto et al. <em>RangeNet++: Fast and Accurate LiDAR Semantic
+Segmentation</em>. IROS, 2019.</li>
+<li><span class="citation"
+data-cites="poliyapram2019pmnet">[@poliyapram2019pmnet]</span>
+Poliyapram et al. <em>A Point-Wise LiDAR and Image Multimodal Fusion
+Network (PMNet) for Aerial Point Cloud 3D Semantic Segmentation</em>.
+Remote Sensing, 2019.</li>
+<li><span class="citation"
+data-cites="wang2019dgcnn">[@wang2019dgcnn]</span> Wang et
+al. <em>Dynamic Graph CNN for Learning on Point Clouds</em>. ACM
+Transactions on Graphics, 2019.</li>
+<li><span class="citation"
+data-cites="zolanvari2019dublincity">[@zolanvari2019dublincity]</span>
+Zolanvari et al. <em>DublinCity: Annotated LiDAR Point Cloud and Its
+Applications</em>. arXiv:1909.03613, 2019.</li>
+<li><span class="citation"
+data-cites="thomas2019kpconv">[@thomas2019kpconv]</span> Thomas et
+al. <em>KPConv: Flexible and Deformable Convolution for Point
+Clouds</em>. ICCV, 2019. arXiv:1904.08889.</li>
+<li><span class="citation"
+data-cites="kochanov2020kprnet">[@kochanov2020kprnet]</span> Kochanov et
+al. <em>KPRNet: Improving Projection-Based LiDAR Semantic
+Segmentation</em>. ECCV Workshops, 2020.</li>
+<li><span class="citation"
+data-cites="hu2020randlanet">[@hu2020randlanet]</span> Hu et
+al. <em>RandLA-Net: Efficient Semantic Segmentation of Large-Scale Point
+Clouds</em>. CVPR, 2020.</li>
+<li><span class="citation"
+data-cites="pierdicca2020pointcloudheritage">[@pierdicca2020pointcloudheritage]</span>
+Pierdicca et al. <em>Point Cloud Semantic Segmentation Using a Deep
+Learning Framework for Cultural Heritage</em>. Remote Sensing,
+2020.</li>
+<li><span class="citation"
+data-cites="tan2020toronto3d">[@tan2020toronto3d]</span> Tan et
+al. <em>Toronto-3D: A Large-scale Mobile LiDAR Dataset for Semantic
+Segmentation of Urban Roadways</em>. CVPRW, 2020.</li>
+<li><span class="citation"
+data-cites="hu2021stpls3d">[@hu2021stpls3d]</span> Hu et al. <em>Towards
+Semantic Segmentation of Urban-Scale 3D Point Clouds: A Dataset,
+Benchmarks and Challenges (SensatUrban)</em>. CVPR, 2021.</li>
+<li><span class="citation"
+data-cites="kolle2021h3d">[@kolle2021h3d]</span> Kolle et al. <em>The
+Hessigheim 3D (H3D) Benchmark on Semantic Segmentation of
+High-Resolution 3D Point Clouds and Textured Meshes from UAV LiDAR and
+Multi-View-Stereo</em>. ISPRS Open Journal, 2021.</li>
+<li><span class="citation"
+data-cites="li2021rethinkinglidar">[@li2021rethinkinglidar]</span> Li et
+al. <em>Rethinking 3D LiDAR Point Cloud Segmentation</em>. IEEE T-ITS,
+2021.</li>
+<li><span class="citation"
+data-cites="triess2021scanbased">[@triess2021scanbased]</span> Triess et
+al. <em>Scan-based Semantic Segmentation of LiDAR Point Clouds: An
+Experimental Study</em>. IV, 2021.</li>
+<li><span class="citation"
+data-cites="wang2021transformerconvolutionbanet">[@wang2021transformerconvolutionbanet]</span>
+Wang et al. <em>Transformer Meets Convolution: A Bilateral Awareness
+Network for Semantic Segmentation of Very Fine Resolution Urban Scene
+Images</em>. Remote Sensing, 2021.</li>
+<li><span class="citation"
+data-cites="zhao2021fidnet">[@zhao2021fidnet]</span> Zhao et
+al. <em>FIDNet: LiDAR Point Cloud Semantic Segmentation with Fully
+Interpolation Decoding</em>. IROS, 2021.</li>
+<li><span class="citation"
+data-cites="atik2022segunet3d">[@atik2022segunet3d]</span> Atik and
+Duran. <em>An Efficient Ensemble Deep Learning Approach for Semantic
+Point Cloud Segmentation Based on 3D Geometric Features and Range
+Images</em>. Sensors, 2022. DOI: 10.3390/s22166210.</li>
+<li><span class="citation"
+data-cites="chen2022stpls3dapr">[@chen2022stpls3dapr]</span> Chen et
+al. <em>STPLS3D: A Large-Scale Synthetic and Real Aerial Photogrammetry
+3D Point Cloud Dataset</em>. arXiv:2203.09065, 2022.</li>
+<li><span class="citation"
+data-cites="shin2022buildingextraction">[@shin2022buildingextraction]</span>
+Shin et al. <em>Semantic Segmentation and Building Extraction from
+Airborne LiDAR Data with Multiple Return Using PointNet++</em>. Applied
+Sciences, 2022.</li>
+<li><span class="citation"
+data-cites="wang2023smanet">[@wang2023smanet]</span> Wang et
+al. <em>Semantic Segmentation of Urban Airborne LiDAR Point Clouds Based
+on Fusion Attention Mechanism and Multi-Scale Features</em>. Remote
+Sensing, 2023. DOI: 10.3390/rs15215248.</li>
+<li><span class="citation"
+data-cites="wysocki2023scan2lod3">[@wysocki2023scan2lod3]</span> Wysocki
+et al. <em>Scan2LoD3: Reconstructing Semantic 3D Building Models at LoD3
+Using Ray Casting and Bayesian Networks</em>. arXiv, 2023.</li>
+<li><span class="citation"
+data-cites="zhang2023survey3dclassification">[@zhang2023survey3dclassification]</span>
+Zhang et al. <em>Deep Learning-based 3D Point Cloud Classification: A
+Systematic Survey and Outlook</em>. arXiv:2311.02608, 2023.</li>
+<li><span class="citation"
+data-cites="aditya2024benchmarkingurbanvegetation">[@aditya2024benchmarkingurbanvegetation]</span>
+Aditya et al. <em>Benchmarking Deep Learning Architectures for Urban
+Vegetation Point Cloud Semantic Segmentation from MLS</em>. IEEE T-GRS,
+2024.</li>
+<li><span class="citation"
+data-cites="alfio2024randomforesturban">[@alfio2024randomforesturban]</span>
+Alfio et al. <em>The Use of Random Forest for the Classification of
+Point Cloud in Urban Scene</em>. IJETT, 2024.</li>
+<li><span class="citation"
+data-cites="bayrak2024ytu3d">[@bayrak2024ytu3d]</span> Bayrak et
+al. <em>A New Dataset and Methodology for Urban-Scale 3D Point Cloud
+Classification</em>. ISPRS Archives, 2023.</li>
+<li><span class="citation"
+data-cites="barco2025turin3d">[@barco2025turin3d]</span> Barco et
+al. <em>Turin3D: Evaluating Adaptation Strategies under Label Scarcity
+in Urban LiDAR Segmentation with Semi-Supervised Techniques</em>.
+arXiv:2504.05882, 2025.</li>
+<li><span class="citation"
+data-cites="mosco2025pointplane">[@mosco2025pointplane]</span> Mosco et
+al. <em>Point-Plane Projections for Accurate LiDAR Semantic Segmentation
+in Small Data Scenarios</em>. arXiv:2509.10841, 2025.</li>
+<li><span class="citation"
+data-cites="poux2025data3dscience">[@poux2025data3dscience]</span> Poux
+et al. <em>3D Data Science with Python: Building Accurate Digital
+Environments with 3D Point Cloud Workflows</em>. 2025.</li>
+</ol>
+</body>
+</html>
